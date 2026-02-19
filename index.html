@@ -279,6 +279,121 @@
             margin-bottom: 10px;
         }
 
+        /* Avatar Pixel Art Characters */
+        .hero-avatars-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 0;
+            position: relative;
+        }
+
+        .avatar-left {
+            position: relative;
+            z-index: 5;
+            margin-right: -10px;
+            align-self: flex-end;
+            margin-bottom: 80px;
+        }
+
+        .avatar-right {
+            position: relative;
+            z-index: 5;
+            margin-left: -10px;
+            align-self: flex-end;
+            margin-bottom: 80px;
+        }
+
+        .pixel-avatar {
+            width: 120px;
+            height: 180px;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 20px var(--pink));
+        }
+
+        .pixel-avatar.mari {
+            animation: dance-mari 1.2s ease-in-out infinite;
+        }
+
+        .pixel-avatar.dary {
+            animation: dance-dary 1.2s ease-in-out infinite;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes dance-mari {
+            0%, 100% { 
+                transform: translateY(0) scaleX(1); 
+            }
+            15% { 
+                transform: translateY(-12px) scaleX(0.98); 
+            }
+            30% { 
+                transform: translateY(0) scaleX(1.02); 
+            }
+            45% { 
+                transform: translateY(-8px) scaleX(0.99); 
+            }
+            60% { 
+                transform: translateY(0) scaleX(1); 
+            }
+            75% { 
+                transform: translateY(-5px) scaleX(1.01); 
+            }
+            90% { 
+                transform: translateY(0) scaleX(1); 
+            }
+        }
+
+        @keyframes dance-dary {
+            0%, 100% { 
+                transform: translateY(0) scaleX(1); 
+            }
+            15% { 
+                transform: translateY(-8px) scaleX(1.02); 
+            }
+            30% { 
+                transform: translateY(0) scaleX(0.98); 
+            }
+            45% { 
+                transform: translateY(-12px) scaleX(1); 
+            }
+            60% { 
+                transform: translateY(0) scaleX(1.01); 
+            }
+            75% { 
+                transform: translateY(-6px) scaleX(0.99); 
+            }
+            90% { 
+                transform: translateY(0) scaleX(1); 
+            }
+        }
+
+        .monitor-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .pixel-avatar {
+                width: 90px;
+                height: 135px;
+            }
+            .avatar-left, .avatar-right {
+                margin-bottom: 60px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .pixel-avatar {
+                width: 60px;
+                height: 90px;
+            }
+            .avatar-left, .avatar-right {
+                margin-bottom: 40px;
+            }
+        }
+
         /* Credits Badge */
         .credits-badge {
             position: absolute;
@@ -1605,8 +1720,62 @@
             </div>
         </div>
 
-        <div>
-            <div class="pixel-monitor">
+        <div class="hero-avatars-container">
+            <!-- Mari Avatar - Left -->
+            <div class="avatar-left">
+                <svg class="pixel-avatar mari" viewBox="0 0 16 24" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Hair back -->
+                    <rect x="3" y="1" width="10" height="3" fill="#8B4513"/>
+                    <rect x="2" y="2" width="2" height="8" fill="#8B4513"/>
+                    <rect x="12" y="2" width="2" height="8" fill="#8B4513"/>
+                    <rect x="1" y="4" width="2" height="8" fill="#A0522D"/>
+                    <rect x="13" y="4" width="2" height="8" fill="#A0522D"/>
+                    <!-- Curly hair details -->
+                    <rect x="1" y="10" width="1" height="2" fill="#8B4513"/>
+                    <rect x="14" y="10" width="1" height="2" fill="#8B4513"/>
+                    <rect x="2" y="11" width="1" height="2" fill="#A0522D"/>
+                    <rect x="13" y="11" width="1" height="2" fill="#A0522D"/>
+                    <!-- Face - morena clara -->
+                    <rect x="4" y="3" width="8" height="7" fill="#d4a574"/>
+                    <rect x="3" y="4" width="1" height="5" fill="#d4a574"/>
+                    <rect x="12" y="4" width="1" height="5" fill="#d4a574"/>
+                    <!-- Hair top curls -->
+                    <rect x="4" y="1" width="2" height="2" fill="#A0522D"/>
+                    <rect x="7" y="0" width="2" height="2" fill="#8B4513"/>
+                    <rect x="10" y="1" width="2" height="2" fill="#A0522D"/>
+                    <!-- Eyes -->
+                    <rect x="5" y="5" width="2" height="2" fill="#1a1a2e"/>
+                    <rect x="9" y="5" width="2" height="2" fill="#1a1a2e"/>
+                    <rect x="5" y="5" width="1" height="1" fill="#fff"/>
+                    <rect x="9" y="5" width="1" height="1" fill="#fff"/>
+                    <!-- Eyelashes -->
+                    <rect x="5" y="4" width="2" height="1" fill="#1a1a2e"/>
+                    <rect x="9" y="4" width="2" height="1" fill="#1a1a2e"/>
+                    <!-- Blush -->
+                    <rect x="4" y="7" width="2" height="1" fill="#ff8080"/>
+                    <rect x="10" y="7" width="2" height="1" fill="#ff8080"/>
+                    <!-- Lips -->
+                    <rect x="7" y="8" width="2" height="1" fill="#ff1493"/>
+                    <!-- Body/Dress -->
+                    <rect x="5" y="10" width="6" height="2" fill="#ff6ec7"/>
+                    <rect x="4" y="12" width="8" height="4" fill="#ff6ec7"/>
+                    <rect x="3" y="14" width="10" height="3" fill="#a855f7"/>
+                    <!-- Arms - morena clara -->
+                    <rect x="2" y="11" width="2" height="1" fill="#d4a574"/>
+                    <rect x="12" y="11" width="2" height="1" fill="#d4a574"/>
+                    <rect x="1" y="12" width="2" height="2" fill="#d4a574"/>
+                    <rect x="13" y="12" width="2" height="2" fill="#d4a574"/>
+                    <!-- Legs - morena clara -->
+                    <rect x="5" y="17" width="2" height="4" fill="#d4a574"/>
+                    <rect x="9" y="17" width="2" height="4" fill="#d4a574"/>
+                    <!-- Shoes -->
+                    <rect x="4" y="21" width="3" height="2" fill="#ff1493"/>
+                    <rect x="9" y="21" width="3" height="2" fill="#ff1493"/>
+                </svg>
+            </div>
+
+            <div class="monitor-section">
+                <div class="pixel-monitor">
                 <div class="monitor-dots">
                     <div class="monitor-dot"></div>
                     <div class="monitor-dot"></div>
@@ -1617,11 +1786,60 @@
                 <div class="pixel-divider"></div>
                 <p id="typing-text"><span class="cursor"></span></p>
             </div>
-            <div class="monitor-stand"></div>
-            <div class="monitor-base"></div>
-            <br>
-            <div style="text-align:center;">
+                <div class="monitor-stand"></div>
+                <div class="monitor-base"></div>
+                <br>
                 <button class="glow-btn" onclick="scrollToSection('what-is')">Explorar >></button>
+            </div>
+
+            <!-- Dary Avatar - Right -->
+            <div class="avatar-right">
+                <svg class="pixel-avatar dary" viewBox="0 0 16 24" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Long black hair back -->
+                    <rect x="3" y="1" width="10" height="2" fill="#1a1a2e"/>
+                    <rect x="2" y="2" width="2" height="14" fill="#1a1a2e"/>
+                    <rect x="12" y="2" width="2" height="14" fill="#1a1a2e"/>
+                    <rect x="1" y="4" width="2" height="14" fill="#0d0d15"/>
+                    <rect x="13" y="4" width="2" height="14" fill="#0d0d15"/>
+                    <!-- Hair waves -->
+                    <rect x="1" y="16" width="1" height="2" fill="#1a1a2e"/>
+                    <rect x="14" y="16" width="1" height="2" fill="#1a1a2e"/>
+                    <rect x="2" y="17" width="1" height="2" fill="#0d0d15"/>
+                    <rect x="13" y="17" width="1" height="2" fill="#0d0d15"/>
+                    <!-- Face -->
+                    <rect x="4" y="3" width="8" height="7" fill="#fce4d6"/>
+                    <rect x="3" y="4" width="1" height="5" fill="#fce4d6"/>
+                    <rect x="12" y="4" width="1" height="5" fill="#fce4d6"/>
+                    <!-- Hair top -->
+                    <rect x="4" y="1" width="8" height="2" fill="#0d0d15"/>
+                    <rect x="3" y="2" width="2" height="2" fill="#1a1a2e"/>
+                    <rect x="11" y="2" width="2" height="2" fill="#1a1a2e"/>
+                    <!-- Eyes -->
+                    <rect x="5" y="5" width="2" height="2" fill="#4a3728"/>
+                    <rect x="9" y="5" width="2" height="2" fill="#4a3728"/>
+                    <rect x="5" y="5" width="1" height="1" fill="#fff"/>
+                    <rect x="9" y="5" width="1" height="1" fill="#fff"/>
+                    <!-- Subtle blush -->
+                    <rect x="4" y="7" width="2" height="1" fill="#ffb6c1"/>
+                    <rect x="10" y="7" width="2" height="1" fill="#ffb6c1"/>
+                    <!-- Lips -->
+                    <rect x="7" y="8" width="2" height="1" fill="#de9090"/>
+                    <!-- Body/Top -->
+                    <rect x="5" y="10" width="6" height="2" fill="#a855f7"/>
+                    <rect x="4" y="12" width="8" height="4" fill="#a855f7"/>
+                    <rect x="3" y="14" width="10" height="3" fill="#7c3aed"/>
+                    <!-- Arms -->
+                    <rect x="2" y="11" width="2" height="1" fill="#fce4d6"/>
+                    <rect x="12" y="11" width="2" height="1" fill="#fce4d6"/>
+                    <rect x="1" y="12" width="2" height="2" fill="#fce4d6"/>
+                    <rect x="13" y="12" width="2" height="2" fill="#fce4d6"/>
+                    <!-- Legs -->
+                    <rect x="5" y="17" width="2" height="4" fill="#fce4d6"/>
+                    <rect x="9" y="17" width="2" height="4" fill="#fce4d6"/>
+                    <!-- Shoes -->
+                    <rect x="4" y="21" width="3" height="2" fill="#7c3aed"/>
+                    <rect x="9" y="21" width="3" height="2" fill="#7c3aed"/>
+                </svg>
             </div>
         </div>
         <div class="scroll-indicator">
