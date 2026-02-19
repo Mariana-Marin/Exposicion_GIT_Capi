@@ -201,8 +201,9 @@
             border: 6px solid #333;
             border-radius: 12px;
             padding: 40px 50px;
-            max-width: 700px;
-            width: 90%;
+            width: 600px;
+            max-width: 90vw;
+            margin: 0 auto;
             box-shadow:
                 0 0 0 3px #555,
                 0 0 40px rgba(255, 110, 199, 0.3),
@@ -290,15 +291,16 @@
 
         .credits-label {
             font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
+            font-size: 9px;
             color: var(--purple);
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            opacity: 0.8;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            opacity: 0.9;
         }
 
         .credits-names {
             display: flex;
+            flex-direction: row;
             align-items: center;
             justify-content: center;
             gap: 15px;
@@ -306,14 +308,14 @@
 
         .creator-name {
             font-family: 'Press Start 2P', cursive;
-            font-size: 11px;
+            font-size: 14px;
             color: var(--pink);
             text-shadow: 0 0 10px var(--pink), 0 0 20px var(--neon-pink);
             animation: name-glow 2s ease-in-out infinite alternate;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: 2px solid var(--purple);
-            border-radius: 4px;
-            background: rgba(168, 85, 247, 0.1);
+            border-radius: 6px;
+            background: rgba(168, 85, 247, 0.15);
             transition: all 0.3s ease;
         }
 
@@ -323,13 +325,13 @@
             transform: scale(1.05);
         }
 
-        .creator-name:nth-child(2) {
+        .creator-name:nth-child(3) {
             animation-delay: 0.5s;
         }
 
         .credits-ampersand {
             font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
+            font-size: 12px;
             color: var(--terminal-green);
             text-shadow: 0 0 10px var(--terminal-green);
         }
@@ -388,19 +390,43 @@
            ============================================ */
         .what-is-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
             margin-top: 30px;
         }
 
+        @media (min-width: 1200px) {
+            .what-is-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .what-is-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .what-is-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .info-card {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(255, 110, 199, 0.1));
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(255, 110, 199, 0.1));
             border: 2px solid var(--purple);
-            border-radius: 8px;
-            padding: 30px;
-            transition: all 0.4s ease;
+            border-radius: 12px;
+            padding: 25px 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .info-card::before {
@@ -410,9 +436,24 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255, 110, 199, 0.1) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(255, 110, 199, 0.15) 0%, transparent 60%);
             opacity: 0;
             transition: opacity 0.4s;
+        }
+
+        .info-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 110, 199, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .info-card:hover::after {
+            left: 100%;
         }
 
         .info-card:hover::before {
@@ -421,29 +462,182 @@
 
         .info-card:hover {
             border-color: var(--pink);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 40px rgba(255, 110, 199, 0.2), 0 0 20px rgba(168, 85, 247, 0.2);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(255, 110, 199, 0.35), 0 0 40px rgba(168, 85, 247, 0.3);
         }
 
-        .card-icon {
-            font-size: 40px;
-            margin-bottom: 15px;
-            display: block;
-            image-rendering: pixelated;
+        .info-card:active {
+            transform: scale(0.98);
         }
 
         .card-title {
             font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--pink);
-            margin-bottom: 12px;
-            text-shadow: 0 0 10px var(--pink);
+            text-shadow: 0 0 15px var(--pink);
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
         }
 
-        .card-text {
-            font-size: 13px;
-            color: #ccc;
-            line-height: 1.8;
+        .card-click-hint {
+            position: absolute;
+            bottom: 8px;
+            right: 10px;
+            font-size: 8px;
+            color: var(--purple);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .info-card:hover .card-click-hint {
+            opacity: 0.7;
+        }
+
+        /* Modal Popup Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(10, 10, 18, 0.98), rgba(5, 5, 12, 0.99));
+            border: 3px solid var(--pink);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.8) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 
+                0 0 40px rgba(255, 110, 199, 0.4),
+                0 0 80px rgba(168, 85, 247, 0.2);
+            animation: modalBreathe 5s ease-in-out infinite;
+        }
+
+        @keyframes modalBreathe {
+            0%, 100% {
+                border-color: var(--pink);
+                box-shadow: 
+                    0 0 35px rgba(255, 110, 199, 0.35),
+                    0 0 60px rgba(168, 85, 247, 0.15);
+            }
+            50% {
+                border-color: var(--pink);
+                box-shadow: 
+                    0 0 45px rgba(255, 110, 199, 0.45),
+                    0 0 80px rgba(168, 85, 247, 0.25);
+            }
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--pink);
+            border-radius: 3px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: transparent;
+            border: 2px solid var(--purple);
+            border-radius: 50%;
+            color: var(--pink);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: var(--pink);
+            border-color: var(--pink);
+            color: var(--dark-bg);
+            transform: rotate(90deg);
+            box-shadow: 0 0 20px var(--pink);
+        }
+
+        .modal-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: var(--pink);
+            text-shadow: 0 0 20px var(--pink);
+            margin-bottom: 20px;
+            padding-right: 40px;
+            line-height: 1.5;
+        }
+
+        .modal-subtitle {
+            font-size: 10px;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            font-size: 14px;
+            color: #ddd;
+            line-height: 2;
+        }
+
+        .modal-text strong {
+            color: var(--soft-pink);
+        }
+
+        .modal-text code {
+            background: rgba(168, 85, 247, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--terminal-green);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .modal-decoration {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pink), var(--purple), var(--neon-pink), var(--purple), var(--pink));
+            background-size: 200% 100%;
+            animation: gradientMove 3s linear infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 0; }
+            100% { background-position: 200% 0; }
         }
 
         /* ============================================
@@ -1328,10 +1522,25 @@
             }
             .pixel-monitor {
                 padding: 30px 20px;
+                width: 90vw;
             }
             .nav-btn {
                 font-size: 7px;
                 padding: 6px 10px;
+            }
+            .credits-badge {
+                top: 70px;
+                width: 100%;
+            }
+            .credits-label {
+                font-size: 7px;
+            }
+            .creator-name {
+                font-size: 10px;
+                padding: 6px 12px;
+            }
+            .credits-ampersand {
+                font-size: 9px;
             }
         }
 
@@ -1379,7 +1588,6 @@
             <button class="nav-btn" onclick="scrollToSection('what-is')">Que es?</button>
             <button class="nav-btn" onclick="scrollToSection('history')">Historia</button>
             <button class="nav-btn" onclick="scrollToSection('terminal')">Terminal</button>
-            <button class="nav-btn" onclick="scrollToSection('vs-gui')">Git vs Otros</button>
             <button class="nav-btn" onclick="scrollToSection('facts')">Datos</button>
             <button class="nav-btn" onclick="scrollToSection('game')">Juegos</button>
         </div>
@@ -1462,25 +1670,52 @@
             </div>
 
             <div class="what-is-grid">
-                <div class="info-card fade-in">
+                <div class="info-card fade-in" onclick="openModal('git')">
                     <h3 class="card-title">Que es GIT?</h3>
-                    <p class="card-text"><strong>Sistema de control de versiones distribuido.</strong> Guarda "fotos" de tu codigo en el tiempo. Puedes volver atras, ver cambios, y trabajar en equipo sin pisarte.</p>
+                    <span class="card-click-hint">click</span>
                 </div>
-                <div class="info-card fade-in">
-                    <h3 class="card-title">Primero: Que es CLI?</h3>
-                    <p class="card-text"><strong>Command Line Interface:</strong> la terminal donde escribes comandos. Git se usa principalmente desde la CLI. Escribes <code>git commit</code> y el sistema guarda tu progreso.</p>
+                <div class="info-card fade-in" onclick="openModal('github')">
+                    <h3 class="card-title">Que es GitHub?</h3>
+                    <span class="card-click-hint">click</span>
                 </div>
-                <div class="info-card fade-in">
-                    <h3 class="card-title">Conceptos Clave</h3>
-                    <p class="card-text"><strong>Repositorio:</strong> carpeta con historial. <strong>Commit:</strong> snapshot de cambios. <strong>Branch:</strong> linea de desarrollo paralela. <strong>Merge:</strong> unir branches.</p>
+                <div class="info-card fade-in" onclick="openModal('cli')">
+                    <h3 class="card-title">Que es CLI?</h3>
+                    <span class="card-click-hint">click</span>
                 </div>
-                <div class="info-card fade-in">
+                <div class="info-card fade-in" onclick="openModal('repo')">
+                    <h3 class="card-title">Repositorio</h3>
+                    <span class="card-click-hint">click</span>
+                </div>
+                <div class="info-card fade-in" onclick="openModal('commit')">
+                    <h3 class="card-title">Commit</h3>
+                    <span class="card-click-hint">click</span>
+                </div>
+                <div class="info-card fade-in" onclick="openModal('branch')">
+                    <h3 class="card-title">Branch</h3>
+                    <span class="card-click-hint">click</span>
+                </div>
+                <div class="info-card fade-in" onclick="openModal('pushpull')">
+                    <h3 class="card-title">Push & Pull</h3>
+                    <span class="card-click-hint">click</span>
+                </div>
+                <div class="info-card fade-in" onclick="openModal('benefits')">
                     <h3 class="card-title">Para que sirve?</h3>
-                    <p class="card-text">Trabajo en equipo sin conflictos, historial completo de cambios, experimentar sin miedo (branches), deshacer errores, y la base de GitHub/GitLab.</p>
+                    <span class="card-click-hint">click</span>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Definition Modal -->
+    <div class="modal-overlay" id="definitionModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-subtitle" id="modalSubtitle"></div>
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <div class="modal-text" id="modalText"></div>
+            <div class="modal-decoration"></div>
+        </div>
+    </div>
 
     <div class="led-strip"></div>
 
@@ -1635,38 +1870,6 @@
 
     <div class="led-strip"></div>
 
-    <!-- ======================== GIT vs OTROS ======================== -->
-    <section id="vs-gui">
-        <div class="section-container">
-            <h2 class="section-title fade-in">// Git vs Otros VCS</h2>
-            <div class="pixel-divider fade-in"></div>
-
-            <div class="comparison-table-wrapper fade-in">
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Aspecto</th>
-                            <th>Git (Distribuido)</th>
-                            <th>SVN (Centralizado)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Arquitectura</td><td>Cada dev tiene copia completa</td><td>Un servidor central</td></tr>
-                        <tr><td>Offline</td><td>Trabajas sin internet</td><td>Necesitas conexion</td></tr>
-                        <tr><td>Velocidad</td><td>Ultra rapido (local)</td><td>Lento (servidor)</td></tr>
-                        <tr><td>Branches</td><td>Baratos y rapidos</td><td>Lentos y pesados</td></tr>
-                        <tr><td>Merge</td><td>Inteligente y facil</td><td>Conflictos frecuentes</td></tr>
-                        <tr><td>Seguridad</td><td>Hash SHA-1 en todo</td><td>Basica</td></tr>
-                        <tr><td>Popularidad</td><td>+95% del mercado</td><td>En declive</td></tr>
-                        <tr><td>Plataformas</td><td>GitHub, GitLab, Bitbucket</td><td>Limitadas</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <div class="led-strip"></div>
-
     <!-- ======================== FUN FACTS ======================== -->
     <section id="facts">
         <div class="section-container">
@@ -1715,6 +1918,142 @@
          JAVASCRIPT
          ============================================ -->
     <script>
+    // ========================
+    // MODAL DEFINITIONS SYSTEM
+    // ========================
+    const definitions = {
+        git: {
+            subtitle: 'Definicion Principal',
+            title: 'Que es GIT?',
+            text: `Git es un <strong>sistema de control de versiones distribuido</strong> creado por Linus Torvalds en 2005. Imagina poder guardar "capturas de pantalla" de tu proyecto en cada momento importante.<br><br>
+            <strong>Git te permite:</strong><br><br>
+            • Guardar cada cambio con una descripcion<br>
+            • Volver a cualquier version anterior<br>
+            • Ver quien modifico que y cuando<br>
+            • Trabajar sin conexion a internet<br>
+            • Cada desarrollador tiene una copia completa del historial`
+        },
+        github: {
+            subtitle: 'Plataforma en la Nube',
+            title: 'Que es GitHub?',
+            text: `<strong>GitHub es una plataforma web</strong> que hospeda repositorios Git en la nube. Git es la herramienta local, GitHub es el servicio online.<br><br>
+            <strong>Caracteristicas:</strong><br><br>
+            • Almacena tu codigo en servidores remotos<br>
+            • Permite colaborar con otros desarrolladores<br>
+            • Ofrece <code>Pull Requests</code> para revisar codigo<br>
+            • Tiene <code>Issues</code> para reportar bugs<br>
+            • <code>GitHub Actions</code> para automatizacion<br>
+            • Propiedad de Microsoft desde 2018<br><br>
+            <strong>Alternativas:</strong> GitLab, Bitbucket, Gitea`
+        },
+        cli: {
+            subtitle: 'Interfaz de Comandos',
+            title: 'Que es CLI?',
+            text: `<strong>Command Line Interface</strong> (Interfaz de Linea de Comandos) es la terminal donde escribes instrucciones de texto para controlar tu computadora.<br><br>
+            <strong>Por que usar CLI con Git?</strong><br><br>
+            • Git se usa principalmente por CLI<br>
+            • Escribes comandos como <code>git add .</code><br>
+            • Mas rapido que interfaces graficas<br>
+            • Control total sobre las operaciones<br>
+            • Disponible en Windows (PowerShell/CMD), Mac y Linux<br>
+            • Los scripts de automatizacion usan CLI`
+        },
+        repo: {
+            subtitle: 'Almacenamiento',
+            title: 'Que es un Repositorio?',
+            text: `Un <strong>repositorio</strong> (o "repo") es una carpeta especial donde Git guarda todo el historial de tu proyecto.<br><br>
+            <strong>Tipos de repositorio:</strong><br><br>
+            • <strong>Local:</strong> en tu computadora<br>
+            • <strong>Remoto:</strong> en GitHub/GitLab/Bitbucket<br><br>
+            <strong>Estructura:</strong><br><br>
+            • Contiene la carpeta oculta <code>.git</code><br>
+            • Guarda todos los commits (versiones)<br>
+            • Almacena branches, tags y configuracion<br>
+            • Se crea con <code>git init</code> o <code>git clone</code>`
+        },
+        commit: {
+            subtitle: 'Guardar Cambios',
+            title: 'Que es un Commit?',
+            text: `Un <strong>commit</strong> es una "foto" o snapshot de tu codigo en un momento especifico. Es la unidad basica de Git.<br><br>
+            <strong>Caracteristicas:</strong><br><br>
+            • Tiene un ID unico (hash SHA-1 de 40 caracteres)<br>
+            • Incluye mensaje descriptivo obligatorio<br>
+            • Registra autor, fecha y cambios exactos<br>
+            • Es inmutable (no se puede modificar)<br>
+            • Cada commit apunta a su commit padre<br><br>
+            <strong>Comando:</strong> <code>git commit -m "descripcion del cambio"</code>`
+        },
+        branch: {
+            subtitle: 'Desarrollo Paralelo',
+            title: 'Que es una Branch?',
+            text: `Una <strong>branch</strong> (rama) es una linea de desarrollo independiente. Permite trabajar en features sin afectar el codigo principal.<br><br>
+            <strong>Conceptos clave:</strong><br><br>
+            • <code>main</code> o <code>master</code> es la rama principal<br>
+            • Crea ramas para cada nueva feature<br>
+            • Experimenta sin romper el codigo estable<br>
+            • <strong>Merge:</strong> unir una rama a main<br>
+            • <strong>Rebase:</strong> reorganizar commits<br><br>
+            <strong>Comandos:</strong><br>
+            • <code>git branch nombre</code> - crear rama<br>
+            • <code>git checkout nombre</code> - cambiar de rama<br>
+            • <code>git merge nombre</code> - fusionar rama`
+        },
+        pushpull: {
+            subtitle: 'Sincronizacion',
+            title: 'Push, Pull, Clone y Fetch',
+            text: `Comandos para sincronizar tu repositorio local con el repositorio remoto (GitHub):<br><br>
+            <strong>Comandos principales:</strong><br><br>
+            • <code>git push</code> - Sube tus commits locales a GitHub<br>
+            • <code>git pull</code> - Descarga y aplica cambios del remoto<br>
+            • <code>git clone URL</code> - Copia un repo completo a tu PC<br>
+            • <code>git fetch</code> - Descarga cambios sin aplicarlos<br><br>
+            <strong>Flujo tipico:</strong><br>
+            1. <code>git pull</code> (actualizar local)<br>
+            2. Hacer cambios en el codigo<br>
+            3. <code>git add .</code> + <code>git commit</code><br>
+            4. <code>git push</code> (subir cambios)`
+        },
+        benefits: {
+            subtitle: 'Beneficios',
+            title: 'Para que sirve Git?',
+            text: `Git es <strong>absolutamente esencial</strong> para cualquier desarrollador moderno:<br><br>
+            <strong>Beneficios principales:</strong><br><br>
+            • Historial completo de cada cambio en tu proyecto<br>
+            • Trabajo en equipo sin conflictos destructivos<br>
+            • Respaldo distribuido y seguro de tu codigo<br>
+            • Deshacer errores facilmente con <code>git revert</code><br>
+            • Experimentar con branches sin riesgo<br>
+            • Ver quien escribio cada linea (<code>git blame</code>)<br><br>
+            <strong>Dato importante:</strong><br>
+            Git es requerido en practicamente CUALQUIER trabajo de programacion. Es una habilidad fundamental.`
+        }
+    };
+
+    function openModal(key) {
+        const modal = document.getElementById('definitionModal');
+        const def = definitions[key];
+        if (!def) return;
+        
+        document.getElementById('modalSubtitle').textContent = def.subtitle;
+        document.getElementById('modalTitle').textContent = def.title;
+        document.getElementById('modalText').innerHTML = def.text;
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+        if (e && e.target !== e.currentTarget) return;
+        const modal = document.getElementById('definitionModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+
     // ========================
     // PARTICLE SYSTEM
     // ========================
@@ -2605,7 +2944,7 @@
         });
     }
     renderFacts();
-    setInterval(function(){ changeFact(1); }, 8000);
+    setInterval(function(){ changeFact(1); }, 15000);
 
     // ========================
     // QUIZ GAME - CLI & GIT
