@@ -1,0 +1,2774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIT - Control de Versiones | Pixel Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           RESET & VARIABLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --pink: #ff6ec7;
+            --hot-pink: #ff1493;
+            --purple: #a855f7;
+            --deep-purple: #7c3aed;
+            --neon-pink: #ff00ff;
+            --neon-purple: #bc13fe;
+            --dark-bg: #0a0a12;
+            --darker-bg: #05050a;
+            --terminal-green: #39ff14;
+            --soft-pink: #ffb6e1;
+            --lavender: #e0b0ff;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background: var(--dark-bg);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           SCROLLBAR CUSTOM
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--darker-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--pink), var(--purple));
+            border-radius: 4px;
+        }
+
+        /* ============================================
+           PARTICLE CANVAS
+           ============================================ */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           PROGRESS BAR
+           ============================================ */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pink), var(--neon-purple), var(--pink));
+            z-index: 2000;
+            box-shadow: 0 0 12px var(--pink);
+            transition: width 0.15s;
+        }
+
+        /* ============================================
+           NAVBAR
+           ============================================ */
+        .navbar {
+            position: fixed;
+            top: 3px;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 10, 18, 0.88);
+            backdrop-filter: blur(15px);
+            border-bottom: 2px solid var(--pink);
+            box-shadow: 0 0 20px rgba(255, 110, 199, 0.3);
+            padding: 10px 0;
+        }
+
+        .navbar .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+            padding: 0 15px;
+        }
+
+        .nav-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            background: transparent;
+            color: var(--pink);
+            border: 2px solid transparent;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: #fff;
+            border-color: var(--pink);
+            background: rgba(255, 110, 199, 0.15);
+            box-shadow: 0 0 15px rgba(255, 110, 199, 0.4), inset 0 0 15px rgba(255, 110, 199, 0.1);
+            text-shadow: 0 0 10px var(--pink);
+        }
+
+        /* ============================================
+           SECTIONS GENERAL
+           ============================================ */
+        section {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 20px;
+        }
+
+        .section-container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(18px, 3vw, 28px);
+            text-align: center;
+            margin-bottom: 50px;
+            color: var(--pink);
+            text-shadow: 0 0 20px var(--pink), 0 0 40px var(--purple), 0 0 80px var(--neon-pink);
+            animation: flicker 3s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 95%, 100% { opacity: 1; }
+            96% { opacity: 0.8; }
+            97% { opacity: 1; }
+            98% { opacity: 0.6; }
+        }
+
+        .pixel-divider {
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--pink) 0px,
+                var(--pink) 8px,
+                transparent 8px,
+                transparent 12px,
+                var(--purple) 12px,
+                var(--purple) 20px,
+                transparent 20px,
+                transparent 24px
+            );
+            margin: 20px auto;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 0 10px var(--pink);
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .pixel-monitor {
+            position: relative;
+            background: #1a1a2e;
+            border: 6px solid #333;
+            border-radius: 12px;
+            padding: 40px 50px;
+            max-width: 700px;
+            width: 90%;
+            box-shadow:
+                0 0 0 3px #555,
+                0 0 40px rgba(255, 110, 199, 0.3),
+                inset 0 0 60px rgba(168, 85, 247, 0.1);
+            animation: monitor-glow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes monitor-glow {
+            0% { box-shadow: 0 0 0 3px #555, 0 0 40px rgba(255, 110, 199, 0.3), inset 0 0 60px rgba(168, 85, 247, 0.1); }
+            100% { box-shadow: 0 0 0 3px #555, 0 0 80px rgba(255, 110, 199, 0.5), inset 0 0 80px rgba(168, 85, 247, 0.2); }
+        }
+
+        .monitor-dots {
+            position: absolute;
+            top: 12px;
+            left: 18px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .monitor-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: dot-pulse 2s infinite;
+        }
+        .monitor-dot:nth-child(1) { background: #ff6b6b; animation-delay: 0s; }
+        .monitor-dot:nth-child(2) { background: #ffd93d; animation-delay: 0.3s; }
+        .monitor-dot:nth-child(3) { background: #6bff6b; animation-delay: 0.6s; }
+
+        @keyframes dot-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.8); }
+        }
+
+        .monitor-stand {
+            width: 80px;
+            height: 30px;
+            background: linear-gradient(#444, #333);
+            margin: 0 auto;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+
+        .monitor-base {
+            width: 150px;
+            height: 8px;
+            background: #444;
+            margin: 0 auto;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .hero-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(24px, 5vw, 48px);
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--pink), var(--purple), var(--neon-pink), var(--lavender));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 4s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: var(--soft-pink);
+            margin-bottom: 10px;
+        }
+
+        /* Credits Badge */
+        .credits-badge {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+        }
+
+        .credits-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            color: var(--purple);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        .credits-names {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .creator-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            color: var(--pink);
+            text-shadow: 0 0 10px var(--pink), 0 0 20px var(--neon-pink);
+            animation: name-glow 2s ease-in-out infinite alternate;
+            padding: 8px 16px;
+            border: 2px solid var(--purple);
+            border-radius: 4px;
+            background: rgba(168, 85, 247, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .creator-name:hover {
+            background: rgba(255, 110, 199, 0.2);
+            border-color: var(--pink);
+            transform: scale(1.05);
+        }
+
+        .creator-name:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .credits-ampersand {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--terminal-green);
+            text-shadow: 0 0 10px var(--terminal-green);
+        }
+
+        @keyframes name-glow {
+            0% { text-shadow: 0 0 10px var(--pink), 0 0 20px var(--neon-pink); }
+            100% { text-shadow: 0 0 15px var(--pink), 0 0 30px var(--neon-pink), 0 0 40px var(--purple); }
+        }
+
+        #typing-text {
+            font-family: 'Fira Code', monospace;
+            font-size: clamp(12px, 2vw, 16px);
+            color: var(--terminal-green);
+            min-height: 30px;
+            text-shadow: 0 0 10px var(--terminal-green);
+        }
+
+        #typing-text .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: var(--terminal-green);
+            animation: blink-cursor 0.7s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+
+        @keyframes blink-cursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator .pixel-arrow {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 20px;
+            color: var(--pink);
+            text-shadow: 0 0 15px var(--pink);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-15px); }
+            60% { transform: translateX(-50%) translateY(-7px); }
+        }
+
+        /* ============================================
+           WHAT IS CLI SECTION
+           ============================================ */
+        .what-is-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(255, 110, 199, 0.1));
+            border: 2px solid var(--purple);
+            border-radius: 8px;
+            padding: 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 110, 199, 0.1) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .info-card:hover::before {
+            opacity: 1;
+        }
+
+        .info-card:hover {
+            border-color: var(--pink);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(255, 110, 199, 0.2), 0 0 20px rgba(168, 85, 247, 0.2);
+        }
+
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        .card-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--pink);
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px var(--pink);
+        }
+
+        .card-text {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.8;
+        }
+
+        /* ============================================
+           PIXEL ART CHARACTERS
+           ============================================ */
+        .pixel-art-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .pixel-character {
+            image-rendering: pixelated;
+            width: 80px;
+            height: 80px;
+            animation: pixel-float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px var(--pink));
+        }
+
+        .pixel-character:nth-child(2) { animation-delay: 0.5s; }
+        .pixel-character:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes pixel-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* ============================================
+           TIMELINE SECTION - INTERACTIVE
+           ============================================ */
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                transparent,
+                var(--pink) 5%,
+                var(--purple) 50%,
+                var(--pink) 95%,
+                transparent
+            );
+            box-shadow: 0 0 20px var(--pink), 0 0 40px var(--purple);
+        }
+
+        .timeline-item {
+            position: relative;
+            width: 45%;
+            padding: 15px;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateX(-80px) scale(0.9);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .timeline-item.right {
+            margin-left: 55%;
+            transform: translateX(80px) scale(0.9);
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: var(--dark-bg);
+            border: 3px solid var(--pink);
+            border-radius: 50%;
+            top: 25px;
+            box-shadow: 0 0 0 4px var(--dark-bg), 0 0 20px var(--pink);
+            z-index: 2;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-item:hover::before {
+            background: var(--pink);
+            transform: scale(1.3);
+            box-shadow: 0 0 0 6px var(--dark-bg), 0 0 30px var(--pink), 0 0 60px var(--neon-pink);
+        }
+
+        .timeline-item:not(.right)::before {
+            right: -32px;
+        }
+
+        .timeline-item.right::before {
+            left: -32px;
+        }
+
+        /* Connecting line animation */
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            top: 32px;
+            width: 25px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--purple), var(--pink));
+            transition: all 0.4s ease;
+        }
+
+        .timeline-item:not(.right)::after {
+            right: -25px;
+        }
+
+        .timeline-item.right::after {
+            left: -25px;
+        }
+
+        .timeline-item:hover::after {
+            box-shadow: 0 0 10px var(--pink);
+        }
+
+        .timeline-content {
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(15, 15, 30, 0.98));
+            border: 2px solid rgba(168, 85, 247, 0.5);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 110, 199, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .timeline-item:hover .timeline-content::before {
+            left: 100%;
+        }
+
+        .timeline-item:hover .timeline-content {
+            border-color: var(--pink);
+            transform: translateY(-5px);
+            box-shadow: 
+                0 15px 40px rgba(255, 110, 199, 0.25),
+                0 0 30px rgba(168, 85, 247, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-item.active .timeline-content {
+            border-color: var(--neon-pink);
+            box-shadow: 
+                0 0 50px rgba(255, 110, 199, 0.4),
+                0 0 100px rgba(168, 85, 247, 0.2);
+        }
+
+        .timeline-year {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--pink);
+            margin-bottom: 12px;
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(255, 0, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 110, 199, 0.3);
+        }
+
+        .timeline-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            color: var(--soft-pink);
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+
+        .timeline-item:hover .timeline-title {
+            color: #fff;
+            text-shadow: 0 0 10px var(--pink);
+        }
+
+        .timeline-desc {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.8;
+            transition: color 0.3s;
+        }
+
+        .timeline-item:hover .timeline-desc {
+            color: #ccc;
+        }
+
+        /* Progress indicator */
+        .timeline-progress {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 0%;
+            background: var(--terminal-green);
+            box-shadow: 0 0 20px var(--terminal-green);
+            z-index: 1;
+            transition: height 0.3s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item,
+            .timeline-item.right {
+                width: calc(100% - 50px);
+                margin-left: 50px;
+                transform: translateX(30px) scale(0.95);
+            }
+            .timeline-item.visible {
+                transform: translateX(0) scale(1);
+            }
+            .timeline-item::before,
+            .timeline-item.right::before {
+                left: -41px;
+                right: auto;
+            }
+            .timeline-item::after,
+            .timeline-item.right::after {
+                left: -25px;
+                right: auto;
+            }
+        }
+
+        /* ============================================
+           INTERACTIVE TERMINAL SIMULATOR
+           ============================================ */
+        .simulator-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .simulator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .simulator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .simulator-panel {
+            background: rgba(5, 5, 15, 0.95);
+            border: 2px solid var(--purple);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.3), 0 0 80px rgba(255, 110, 199, 0.1);
+        }
+
+        .panel-header {
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.3), rgba(255, 110, 199, 0.3));
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .panel-header-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .panel-header-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .panel-header-dot:nth-child(1) { background: #ff5f57; }
+        .panel-header-dot:nth-child(2) { background: #ffbd2e; }
+        .panel-header-dot:nth-child(3) { background: #28c840; }
+
+        .panel-header-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            color: var(--soft-pink);
+            flex: 1;
+            text-align: center;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            min-height: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        .terminal-body::-webkit-scrollbar { width: 6px; }
+        .terminal-body::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
+
+        .terminal-line {
+            margin-bottom: 5px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .terminal-prompt {
+            color: var(--pink);
+            font-weight: bold;
+        }
+
+        .terminal-output {
+            color: var(--lavender);
+        }
+
+        /* File Explorer Panel */
+        .file-explorer {
+            padding: 15px;
+            min-height: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .file-explorer::-webkit-scrollbar { width: 6px; }
+        .file-explorer::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 3px; }
+
+        .explorer-path {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            color: var(--pink);
+            padding: 10px 15px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .explorer-path-icon {
+            font-size: 14px;
+        }
+
+        .file-tree {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 4px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(26, 26, 46, 0.5);
+            border: 1px solid transparent;
+        }
+
+        .file-item:hover {
+            background: rgba(168, 85, 247, 0.15);
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .file-item.folder {
+            color: var(--pink);
+        }
+
+        .file-item.file {
+            color: var(--lavender);
+        }
+
+        .file-item.new-item {
+            animation: newFileAnim 0.5s ease;
+        }
+
+        .file-item.deleting {
+            animation: deleteFileAnim 0.4s ease forwards;
+        }
+
+        @keyframes newFileAnim {
+            0% { opacity: 0; transform: translateX(-20px); background: rgba(57, 255, 20, 0.2); }
+            50% { background: rgba(57, 255, 20, 0.3); }
+            100% { opacity: 1; transform: translateX(0); background: rgba(26, 26, 46, 0.5); }
+        }
+
+        @keyframes deleteFileAnim {
+            0% { opacity: 1; transform: translateX(0); background: rgba(255, 95, 87, 0.2); }
+            100% { opacity: 0; transform: translateX(20px); height: 0; padding: 0; margin: 0; }
+        }
+
+        .file-icon {
+            margin-right: 12px;
+            font-size: 18px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .file-name {
+            font-size: 13px;
+            flex: 1;
+        }
+
+        .file-size {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .empty-folder {
+            color: #555;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .terminal-success {
+            color: var(--terminal-green);
+        }
+
+        .terminal-error {
+            color: #ff5f57;
+        }
+
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: rgba(10, 10, 20, 0.8);
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .terminal-input-line .prompt-symbol {
+            color: var(--pink);
+            font-weight: bold;
+            margin-right: 10px;
+            text-shadow: 0 0 10px var(--pink);
+            font-size: 12px;
+        }
+
+        #terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            outline: none;
+            caret-color: var(--pink);
+        }
+
+        .terminal-hint {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            color: var(--purple);
+            text-align: center;
+            margin-top: 15px;
+            animation: pulse-text 2s infinite;
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .commands-reference {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .cmd-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .cmd-name {
+            color: var(--terminal-green);
+            font-weight: bold;
+            min-width: 90px;
+        }
+
+        .cmd-desc {
+            color: #888;
+        }
+
+        /* ============================================
+           COMPARISONS TABLE
+           ============================================ */
+        .comparison-table-wrapper {
+            overflow-x: auto;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .comparison-table {
+            width: 100%;
+            min-width: 500px;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 2px solid var(--purple);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(255, 110, 199, 0.4));
+            color: #fff;
+            padding: 18px;
+            text-shadow: 0 0 10px var(--pink);
+        }
+
+        .comparison-table td {
+            padding: 15px 18px;
+            font-size: 13px;
+            color: #ccc;
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+            transition: all 0.3s;
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(255, 110, 199, 0.05);
+            color: #fff;
+        }
+
+        .comparison-table td:first-child {
+            color: var(--pink);
+            font-weight: bold;
+        }
+
+        /* ============================================
+           FUN FACTS SECTION
+           ============================================ */
+        .facts-carousel {
+            position: relative;
+            overflow: hidden;
+            border: 3px solid var(--purple);
+            border-radius: 12px;
+            background: rgba(10, 10, 18, 0.8);
+            padding: 50px 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.2);
+        }
+
+        .fact-card {
+            text-align: center;
+            display: none;
+            animation: fact-in 0.5s ease;
+        }
+
+        .fact-card.active {
+            display: block;
+        }
+
+        @keyframes fact-in {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .fact-number {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 48px;
+            color: var(--pink);
+            text-shadow: 0 0 30px var(--pink), 0 0 60px var(--purple);
+            margin-bottom: 15px;
+        }
+
+        .fact-text {
+            font-size: 16px;
+            color: var(--lavender);
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto 25px;
+        }
+
+        .fact-source {
+            font-size: 11px;
+            color: var(--purple);
+            font-style: italic;
+        }
+
+        .fact-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .fact-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            background: transparent;
+            color: var(--pink);
+            border: 2px solid var(--pink);
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fact-btn:hover {
+            background: var(--pink);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--pink);
+        }
+
+        .fact-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .fact-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--purple);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .fact-dot.active {
+            background: var(--pink);
+            box-shadow: 0 0 10px var(--pink);
+            transform: scale(1.3);
+        }
+
+        /* ============================================
+           COMMANDS GAME
+           ============================================ */
+        .game-container {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .game-score {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: var(--pink);
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px var(--pink);
+        }
+
+        .game-question {
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid var(--purple);
+            border-radius: 10px;
+            padding: 35px;
+            margin-bottom: 25px;
+        }
+
+        .game-question-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--soft-pink);
+            line-height: 2;
+            margin-bottom: 10px;
+        }
+
+        .game-command {
+            font-size: 22px;
+            color: var(--terminal-green);
+            text-shadow: 0 0 15px var(--terminal-green);
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .game-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .game-option {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 2px solid var(--purple);
+            color: #ddd;
+            padding: 18px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .game-option:hover {
+            border-color: var(--pink);
+            background: rgba(255, 110, 199, 0.15);
+            color: #fff;
+            transform: scale(1.02);
+        }
+
+        .game-option.correct {
+            border-color: var(--terminal-green);
+            background: rgba(57, 255, 20, 0.2);
+            color: var(--terminal-green);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+        }
+
+        .game-option.wrong {
+            border-color: #ff5f57;
+            background: rgba(255, 95, 87, 0.2);
+            color: #ff5f57;
+            box-shadow: 0 0 20px rgba(255, 95, 87, 0.3);
+        }
+
+        .game-result {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            margin-top: 20px;
+            min-height: 25px;
+        }
+
+        /* ============================================
+           LED STRIP DECORATION
+           ============================================ */
+        .led-strip {
+            height: 6px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--pink) 0px,
+                var(--pink) 10px,
+                transparent 10px,
+                transparent 14px,
+                var(--purple) 14px,
+                var(--purple) 24px,
+                transparent 24px,
+                transparent 28px,
+                var(--neon-pink) 28px,
+                var(--neon-pink) 38px,
+                transparent 38px,
+                transparent 42px
+            );
+            box-shadow: 0 0 15px var(--pink), 0 2px 25px var(--purple);
+            animation: led-move 3s linear infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes led-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 42px 0; }
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 2px solid var(--purple);
+            background: rgba(5, 5, 10, 0.9);
+        }
+
+        .footer-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: var(--purple);
+            line-height: 2;
+        }
+
+        .footer-heart {
+            color: var(--pink);
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.3); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.2); }
+        }
+
+        /* Glow button */
+        .glow-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            padding: 15px 35px;
+            background: transparent;
+            color: var(--pink);
+            border: 3px solid var(--pink);
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.4s;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 110, 199, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .glow-btn:hover::before {
+            left: 100%;
+        }
+
+        .glow-btn:hover {
+            background: var(--pink);
+            color: var(--dark-bg);
+            box-shadow: 0 0 30px var(--pink), 0 0 60px var(--purple);
+        }
+
+        /* Matrix rain effect overlay */
+        .matrix-column {
+            position: fixed;
+            top: -100%;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: var(--pink);
+            opacity: 0.06;
+            z-index: 0;
+            pointer-events: none;
+            writing-mode: vertical-lr;
+            text-shadow: 0 0 5px var(--pink);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item {
+                width: calc(100% - 50px);
+                margin-left: 50px !important;
+            }
+            .timeline-item::before {
+                left: -42px !important;
+                right: auto !important;
+            }
+            .game-options {
+                grid-template-columns: 1fr;
+            }
+            .pixel-monitor {
+                padding: 30px 20px;
+            }
+            .nav-btn {
+                font-size: 7px;
+                padding: 6px 10px;
+            }
+        }
+
+        /* ============================================
+           ANIMATIONS ON SCROLL
+           ============================================ */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============================================
+           FLOATING PIXEL CHARACTERS (canvas-based)
+           ============================================ */
+        #pixel-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- PARTICLES BACKGROUND -->
+    <canvas id="particles-canvas"></canvas>
+    <!-- PIXEL ART FLOATING CHARACTERS -->
+    <canvas id="pixel-canvas"></canvas>
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-inner">
+            <button class="nav-btn active" onclick="scrollToSection('hero')">Inicio</button>
+            <button class="nav-btn" onclick="scrollToSection('what-is')">Que es?</button>
+            <button class="nav-btn" onclick="scrollToSection('history')">Historia</button>
+            <button class="nav-btn" onclick="scrollToSection('terminal')">Terminal</button>
+            <button class="nav-btn" onclick="scrollToSection('vs-gui')">Git vs Otros</button>
+            <button class="nav-btn" onclick="scrollToSection('facts')">Datos</button>
+            <button class="nav-btn" onclick="scrollToSection('game')">Juegos</button>
+        </div>
+    </nav>
+
+    <!-- ======================== HERO ======================== -->
+    <section id="hero">
+        <!-- Credits Badge -->
+        <div class="credits-badge">
+            <div class="credits-label">// CREATED BY</div>
+            <div class="credits-names">
+                <span class="creator-name">Mari</span>
+                <span class="credits-ampersand">&</span>
+                <span class="creator-name">Dary</span>
+            </div>
+        </div>
+
+        <div>
+            <div class="pixel-monitor">
+                <div class="monitor-dots">
+                    <div class="monitor-dot"></div>
+                    <div class="monitor-dot"></div>
+                    <div class="monitor-dot"></div>
+                </div>
+                <h1 class="hero-title">GIT</h1>
+                <p class="hero-subtitle">Distributed Version Control System</p>
+                <div class="pixel-divider"></div>
+                <p id="typing-text"><span class="cursor"></span></p>
+            </div>
+            <div class="monitor-stand"></div>
+            <div class="monitor-base"></div>
+            <br>
+            <div style="text-align:center;">
+                <button class="glow-btn" onclick="scrollToSection('what-is')">Explorar >></button>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="pixel-arrow">V</div>
+        </div>
+    </section>
+
+    <div class="led-strip"></div>
+
+    <!-- ======================== WHAT IS GIT ======================== -->
+    <section id="what-is">
+        <div class="section-container">
+            <h2 class="section-title fade-in">// Que es GIT?</h2>
+            <div class="pixel-divider fade-in"></div>
+
+            <!-- Pixel Art Characters -->
+            <div class="pixel-art-container fade-in">
+                <svg class="pixel-character" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="2" width="14" height="12" fill="#1a1a2e" stroke="#ff6ec7" stroke-width="1"/>
+                    <rect x="1" y="2" width="14" height="3" fill="#a855f7"/>
+                    <rect x="2" y="3" width="2" height="1" fill="#ff5f57"/>
+                    <rect x="5" y="3" width="2" height="1" fill="#ffbd2e"/>
+                    <rect x="8" y="3" width="2" height="1" fill="#28c840"/>
+                    <rect x="3" y="7" width="1" height="1" fill="#ff6ec7"/>
+                    <rect x="4" y="8" width="1" height="1" fill="#ff6ec7"/>
+                    <rect x="5" y="9" width="3" height="1" fill="#ff6ec7"/>
+                    <rect x="3" y="11" width="5" height="1" fill="#a855f7"/>
+                </svg>
+                <svg class="pixel-character" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="5" width="14" height="8" rx="1" fill="#2a2a3e" stroke="#ff6ec7" stroke-width="0.5"/>
+                    <rect x="2" y="6" width="2" height="2" fill="#a855f7"/>
+                    <rect x="5" y="6" width="2" height="2" fill="#a855f7"/>
+                    <rect x="8" y="6" width="2" height="2" fill="#ff6ec7"/>
+                    <rect x="11" y="6" width="2" height="2" fill="#a855f7"/>
+                    <rect x="2" y="9" width="2" height="2" fill="#a855f7"/>
+                    <rect x="5" y="9" width="6" height="2" fill="#ff6ec7"/>
+                    <rect x="12" y="9" width="2" height="2" fill="#a855f7"/>
+                </svg>
+                <svg class="pixel-character" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="3" width="5" height="2" fill="#ff6ec7"/>
+                    <rect x="1" y="5" width="14" height="9" fill="#a855f7" rx="1"/>
+                    <rect x="3" y="7" width="3" height="1" fill="#ffb6e1"/>
+                    <rect x="3" y="9" width="6" height="1" fill="#ffb6e1"/>
+                    <rect x="3" y="11" width="4" height="1" fill="#ffb6e1"/>
+                </svg>
+            </div>
+
+            <div class="what-is-grid">
+                <div class="info-card fade-in">
+                    <h3 class="card-title">Que es GIT?</h3>
+                    <p class="card-text"><strong>Sistema de control de versiones distribuido.</strong> Guarda "fotos" de tu codigo en el tiempo. Puedes volver atras, ver cambios, y trabajar en equipo sin pisarte.</p>
+                </div>
+                <div class="info-card fade-in">
+                    <h3 class="card-title">Primero: Que es CLI?</h3>
+                    <p class="card-text"><strong>Command Line Interface:</strong> la terminal donde escribes comandos. Git se usa principalmente desde la CLI. Escribes <code>git commit</code> y el sistema guarda tu progreso.</p>
+                </div>
+                <div class="info-card fade-in">
+                    <h3 class="card-title">Conceptos Clave</h3>
+                    <p class="card-text"><strong>Repositorio:</strong> carpeta con historial. <strong>Commit:</strong> snapshot de cambios. <strong>Branch:</strong> linea de desarrollo paralela. <strong>Merge:</strong> unir branches.</p>
+                </div>
+                <div class="info-card fade-in">
+                    <h3 class="card-title">Para que sirve?</h3>
+                    <p class="card-text">Trabajo en equipo sin conflictos, historial completo de cambios, experimentar sin miedo (branches), deshacer errores, y la base de GitHub/GitLab.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="led-strip"></div>
+
+    <!-- ======================== HISTORY ======================== -->
+    <section id="history">
+        <div class="section-container">
+            <h2 class="section-title fade-in">// Historia de GIT</h2>
+            <div class="pixel-divider fade-in"></div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">1972</div>
+                        <div class="timeline-title">SCCS - El Origen</div>
+                        <div class="timeline-desc">Bell Labs crea SCCS (Source Code Control System), el primer sistema de control de versiones. Solo guardaba diferencias entre archivos. El abuelo de Git!</div>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-year">1986</div>
+                        <div class="timeline-title">CVS Aparece</div>
+                        <div class="timeline-desc">CVS (Concurrent Versions System) permite que multiples desarrolladores trabajen en el mismo proyecto. Revolucionario, pero con muchos bugs y limitaciones.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2000</div>
+                        <div class="timeline-title">SVN Mejora Todo</div>
+                        <div class="timeline-desc">Subversion (SVN) arregla los problemas de CVS. Se vuelve el estandar en empresas. Pero sigue siendo centralizado: si el servidor cae, nadie trabaja.</div>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2002</div>
+                        <div class="timeline-title">BitKeeper & Linux</div>
+                        <div class="timeline-desc">El kernel de Linux usa BitKeeper, un sistema propietario. Linus Torvalds lo ama por ser distribuido. Pero en 2005, BitKeeper revoca la licencia gratuita...</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2005</div>
+                        <div class="timeline-title">Nace GIT!</div>
+                        <div class="timeline-desc">Linus Torvalds, furioso, crea Git en solo 2 SEMANAS! Lo disena para ser rapido, distribuido y seguro. El nombre significa "idiota" en britanico (Linus tiene humor).</div>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2008</div>
+                        <div class="timeline-title">GitHub Revoluciona</div>
+                        <div class="timeline-desc">GitHub lanza su plataforma. Git + Social Network = exito masivo. Por primera vez, compartir codigo es facil y divertido. Nace el open source moderno.</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-year">2018</div>
+                        <div class="timeline-title">Microsoft Compra GitHub</div>
+                        <div class="timeline-desc">Microsoft adquiere GitHub por $7.5 BILLONES. La comunidad temia lo peor, pero GitHub mejoro. Ironia: Microsoft odiaba el open source en los 2000s.</div>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="timeline-year">HOY</div>
+                        <div class="timeline-title">Git Domina el Mundo</div>
+                        <div class="timeline-desc">+95% de desarrolladores usan Git. GitHub tiene +100 millones de usuarios. GitLab, Bitbucket compiten. Git es EL estandar mundial para codigo.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="led-strip"></div>
+
+    <!-- ======================== INTERACTIVE TERMINAL SIMULATOR ======================== -->
+    <section id="terminal">
+        <div class="section-container">
+            <h2 class="section-title fade-in">// Simulador de Terminal</h2>
+            <div class="pixel-divider fade-in"></div>
+
+            <div class="simulator-wrapper fade-in">
+                <div class="simulator-container">
+                    <!-- Terminal Panel -->
+                    <div class="simulator-panel">
+                        <div class="panel-header">
+                            <div class="panel-header-dots">
+                                <div class="panel-header-dot"></div>
+                                <div class="panel-header-dot"></div>
+                                <div class="panel-header-dot"></div>
+                            </div>
+                            <div class="panel-header-title">Terminal Bash</div>
+                        </div>
+                        <div class="terminal-body" id="terminal-body">
+                            <div class="terminal-line terminal-output">Bienvenido al simulador de terminal!</div>
+                            <div class="terminal-line terminal-output">Escribe <span style="color:var(--terminal-green)">help</span> para ver comandos.</div>
+                            <div class="terminal-line terminal-output">El explorador de archivos se actualiza en tiempo real.</div>
+                            <div class="terminal-line terminal-output">---</div>
+                        </div>
+                        <div class="terminal-input-line">
+                            <span class="prompt-symbol">user@linux:~$</span>
+                            <input type="text" id="terminal-input" placeholder="escribe un comando..." autocomplete="off" spellcheck="false">
+                        </div>
+                    </div>
+
+                    <!-- File Explorer Panel -->
+                    <div class="simulator-panel">
+                        <div class="panel-header">
+                            <div class="panel-header-dots">
+                                <div class="panel-header-dot"></div>
+                                <div class="panel-header-dot"></div>
+                                <div class="panel-header-dot"></div>
+                            </div>
+                            <div class="panel-header-title">Explorador de Archivos</div>
+                        </div>
+                        <div class="file-explorer" id="file-explorer">
+                            <div class="explorer-path">
+                                <span class="explorer-path-icon">📁</span>
+                                <span id="current-path">~/home</span>
+                            </div>
+                            <ul class="file-tree" id="file-tree">
+                                <!-- Generated by JS -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="terminal-hint">Ejecuta comandos y observa como cambia el sistema de archivos en tiempo real</p>
+
+                <!-- Commands Reference -->
+                <div class="commands-reference">
+                    <div class="cmd-item"><span class="cmd-name">ls</span><span class="cmd-desc">Listar archivos</span></div>
+                    <div class="cmd-item"><span class="cmd-name">pwd</span><span class="cmd-desc">Directorio actual</span></div>
+                    <div class="cmd-item"><span class="cmd-name">cd [dir]</span><span class="cmd-desc">Cambiar directorio</span></div>
+                    <div class="cmd-item"><span class="cmd-name">mkdir [name]</span><span class="cmd-desc">Crear carpeta</span></div>
+                    <div class="cmd-item"><span class="cmd-name">touch [name]</span><span class="cmd-desc">Crear archivo</span></div>
+                    <div class="cmd-item"><span class="cmd-name">rm [name]</span><span class="cmd-desc">Eliminar archivo</span></div>
+                    <div class="cmd-item"><span class="cmd-name">cat [file]</span><span class="cmd-desc">Ver contenido</span></div>
+                    <div class="cmd-item"><span class="cmd-name">clear</span><span class="cmd-desc">Limpiar terminal</span></div>
+                    <div class="cmd-item"><span class="cmd-name">help</span><span class="cmd-desc">Ver ayuda</span></div>
+                </div>
+                <h4 style="color: var(--neon-pink); margin: 15px 0 10px; font-size: 0.7rem;">Git Commands</h4>
+                <div class="commands-reference">
+                    <div class="cmd-item"><span class="cmd-name">git init</span><span class="cmd-desc">Iniciar repo</span></div>
+                    <div class="cmd-item"><span class="cmd-name">git status</span><span class="cmd-desc">Ver estado</span></div>
+                    <div class="cmd-item"><span class="cmd-name">git add .</span><span class="cmd-desc">Agregar cambios</span></div>
+                    <div class="cmd-item"><span class="cmd-name">git commit -m ""</span><span class="cmd-desc">Guardar commit</span></div>
+                    <div class="cmd-item"><span class="cmd-name">git log</span><span class="cmd-desc">Ver historial</span></div>
+                    <div class="cmd-item"><span class="cmd-name">git branch</span><span class="cmd-desc">Ver ramas</span></div>
+                    <div class="cmd-item"><span class="cmd-name">git checkout</span><span class="cmd-desc">Cambiar rama</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="led-strip"></div>
+
+    <!-- ======================== GIT vs OTROS ======================== -->
+    <section id="vs-gui">
+        <div class="section-container">
+            <h2 class="section-title fade-in">// Git vs Otros VCS</h2>
+            <div class="pixel-divider fade-in"></div>
+
+            <div class="comparison-table-wrapper fade-in">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Aspecto</th>
+                            <th>Git (Distribuido)</th>
+                            <th>SVN (Centralizado)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Arquitectura</td><td>Cada dev tiene copia completa</td><td>Un servidor central</td></tr>
+                        <tr><td>Offline</td><td>Trabajas sin internet</td><td>Necesitas conexion</td></tr>
+                        <tr><td>Velocidad</td><td>Ultra rapido (local)</td><td>Lento (servidor)</td></tr>
+                        <tr><td>Branches</td><td>Baratos y rapidos</td><td>Lentos y pesados</td></tr>
+                        <tr><td>Merge</td><td>Inteligente y facil</td><td>Conflictos frecuentes</td></tr>
+                        <tr><td>Seguridad</td><td>Hash SHA-1 en todo</td><td>Basica</td></tr>
+                        <tr><td>Popularidad</td><td>+95% del mercado</td><td>En declive</td></tr>
+                        <tr><td>Plataformas</td><td>GitHub, GitLab, Bitbucket</td><td>Limitadas</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="led-strip"></div>
+
+    <!-- ======================== FUN FACTS ======================== -->
+    <section id="facts">
+        <div class="section-container">
+            <h2 class="section-title fade-in">// Datos Curiosos</h2>
+            <div class="pixel-divider fade-in"></div>
+
+            <div class="facts-carousel fade-in" id="facts-carousel">
+                <!-- Facts generated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <div class="led-strip"></div>
+
+    <!-- ======================== GAMES ======================== -->
+    <section id="game">
+        <div class="section-container">
+            <h2 class="section-title fade-in">// Adivina el Comando!</h2>
+            <div class="pixel-divider fade-in"></div>
+
+            <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;" class="fade-in">
+                <button class="glow-btn" id="btn-game-cli" onclick="switchGame('cli')" style="font-size: 10px;">Juego CLI</button>
+                <button class="glow-btn" id="btn-game-git" onclick="switchGame('git')" style="font-size: 10px; opacity: 0.6;">Juego GIT</button>
+            </div>
+
+            <div class="game-container fade-in" id="game-container">
+                <!-- Game content generated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <div class="led-strip"></div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p class="footer-text">
+            Hecho con <span class="footer-heart">&#9829;</span> y muchos commits
+            <br><br>
+            Git Expo 2026 | Pixel Edition
+            <br>
+            <span style="color: var(--pink);">></span> git commit -m "El codigo nunca muere!" <span style="color: var(--pink);">_</span>
+        </p>
+    </footer>
+
+    <!-- ============================================
+         JAVASCRIPT
+         ============================================ -->
+    <script>
+    // ========================
+    // PARTICLE SYSTEM
+    // ========================
+    const pCanvas = document.getElementById('particles-canvas');
+    const pCtx = pCanvas.getContext('2d');
+    let particles = [];
+
+    function resizePCanvas() {
+        pCanvas.width = window.innerWidth;
+        pCanvas.height = window.innerHeight;
+    }
+    resizePCanvas();
+    window.addEventListener('resize', resizePCanvas);
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * pCanvas.width;
+            this.y = Math.random() * pCanvas.height;
+            this.size = Math.random() * 3 + 1;
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.speedY = (Math.random() - 0.5) * 0.5;
+            this.opacity = Math.random() * 0.5 + 0.1;
+            this.color = Math.random() > 0.5 ? '#ff6ec7' : '#a855f7';
+            this.pulse = Math.random() * Math.PI * 2;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.pulse += 0.02;
+            this.opacity = (Math.sin(this.pulse) * 0.3 + 0.3);
+            if (this.x < 0 || this.x > pCanvas.width || this.y < 0 || this.y > pCanvas.height) this.reset();
+        }
+        draw() {
+            pCtx.fillStyle = this.color;
+            pCtx.globalAlpha = this.opacity;
+            pCtx.fillRect(Math.floor(this.x), Math.floor(this.y), this.size, this.size);
+            pCtx.globalAlpha = 1;
+        }
+    }
+
+    for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+    function animateParticles() {
+        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // ========================
+    // FLOATING PIXEL ART CHARACTERS
+    // ========================
+    (function(){
+        const canvas = document.getElementById('pixel-canvas');
+        const ctx = canvas.getContext('2d');
+        function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const S = 3; // pixel scale
+
+        const catPixels = [
+            [2,0,'#f9a8d4'],[3,0,'#f9a8d4'],[4,0,'#f9a8d4'],[5,0,'#f9a8d4'],
+            [1,1,'#f9a8d4'],[2,1,'#f9a8d4'],[3,1,'#f9a8d4'],[4,1,'#f9a8d4'],[5,1,'#f9a8d4'],[6,1,'#f9a8d4'],
+            [1,2,'#f9a8d4'],[2,2,'#222'],[3,2,'#f9a8d4'],[4,2,'#f9a8d4'],[5,2,'#222'],[6,2,'#f9a8d4'],
+            [1,3,'#f9a8d4'],[2,3,'#f9a8d4'],[3,3,'#ff1493'],[4,3,'#ff1493'],[5,3,'#f9a8d4'],[6,3,'#f9a8d4'],
+            [2,4,'#f9a8d4'],[3,4,'#f9a8d4'],[4,4,'#f9a8d4'],[5,4,'#f9a8d4'],
+            [1,5,'#f9a8d4'],[2,5,'#f9a8d4'],[3,5,'#f9a8d4'],[4,5,'#f9a8d4'],[5,5,'#f9a8d4'],[6,5,'#f9a8d4'],
+            [1,6,'#f9a8d4'],[2,6,'#f9a8d4'],[5,6,'#f9a8d4'],[6,6,'#f9a8d4'],
+            [0,0,'#f9a8d4'],[7,0,'#f9a8d4'],
+        ];
+
+        const robotPixels = [
+            [3,0,'#a855f7'],[4,0,'#a855f7'],
+            [2,1,'#c0a0f0'],[3,1,'#c0a0f0'],[4,1,'#c0a0f0'],[5,1,'#c0a0f0'],
+            [1,2,'#c0a0f0'],[2,2,'#00f5ff'],[3,2,'#c0a0f0'],[4,2,'#c0a0f0'],[5,2,'#00f5ff'],[6,2,'#c0a0f0'],
+            [1,3,'#c0a0f0'],[2,3,'#c0a0f0'],[3,3,'#ff1493'],[4,3,'#c0a0f0'],[5,3,'#c0a0f0'],[6,3,'#c0a0f0'],
+            [2,4,'#a855f7'],[3,4,'#a855f7'],[4,4,'#a855f7'],[5,4,'#a855f7'],
+            [1,5,'#a855f7'],[2,5,'#c0a0f0'],[3,5,'#c0a0f0'],[4,5,'#c0a0f0'],[5,5,'#c0a0f0'],[6,5,'#a855f7'],
+            [2,6,'#a855f7'],[5,6,'#a855f7'],
+        ];
+
+        const heartPixels = [
+            [1,0,'#ff1493'],[2,0,'#ff1493'],[4,0,'#ff1493'],[5,0,'#ff1493'],
+            [0,1,'#ff1493'],[1,1,'#ff6ec7'],[2,1,'#ff1493'],[3,1,'#ff1493'],[4,1,'#ff6ec7'],[5,1,'#ff1493'],[6,1,'#ff1493'],
+            [0,2,'#ff1493'],[1,2,'#ff1493'],[2,2,'#ff1493'],[3,2,'#ff1493'],[4,2,'#ff1493'],[5,2,'#ff1493'],[6,2,'#ff1493'],
+            [1,3,'#ff1493'],[2,3,'#ff1493'],[3,3,'#ff1493'],[4,3,'#ff1493'],[5,3,'#ff1493'],
+            [2,4,'#ff1493'],[3,4,'#ff1493'],[4,4,'#ff1493'],
+            [3,5,'#ff1493'],
+        ];
+
+        function drawPixels(pixels, ox, oy, scale){
+            pixels.forEach(([px, py, color])=>{
+                ctx.fillStyle = color;
+                ctx.fillRect(ox + px*scale, oy + py*scale, scale, scale);
+            });
+        }
+
+        const chars = [
+            { pixels: catPixels, x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: 0.7, vy: 0.3 },
+            { pixels: robotPixels, x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: -0.6, vy: 0.5 },
+            { pixels: heartPixels, x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: 0.9, vy: -0.4 },
+            { pixels: catPixels, x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: -0.8, vy: 0.6 },
+            { pixels: robotPixels, x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: 0.5, vy: -0.7 },
+            { pixels: heartPixels, x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: -0.4, vy: 0.8 },
+        ];
+
+        function animate(){
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            chars.forEach(c=>{
+                c.x += c.vx;
+                c.y += c.vy;
+                if(c.x < -30) c.x = canvas.width + 30;
+                if(c.x > canvas.width + 30) c.x = -30;
+                if(c.y < -30) c.y = canvas.height + 30;
+                if(c.y > canvas.height + 30) c.y = -30;
+                ctx.save();
+                ctx.shadowColor = '#ff6ec7';
+                ctx.shadowBlur = 8;
+                ctx.globalAlpha = 0.5;
+                drawPixels(c.pixels, c.x, c.y, S);
+                ctx.restore();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })();
+
+    // ========================
+    // MATRIX RAIN EFFECT
+    // ========================
+    function createMatrixColumns() {
+        const chars = '01{}[]<>/\\|$#@!?%^&*~CLI>_';
+        for (let i = 0; i < 15; i++) {
+            const col = document.createElement('div');
+            col.className = 'matrix-column';
+            col.style.left = (Math.random() * 100) + '%';
+            col.style.fontSize = (8 + Math.random() * 8) + 'px';
+            let text = '';
+            for (let j = 0; j < 30; j++) text += chars[Math.floor(Math.random() * chars.length)] + ' ';
+            col.textContent = text;
+            col.style.animation = `matrix-fall ${10 + Math.random() * 15}s linear infinite`;
+            col.style.animationDelay = `${Math.random() * 10}s`;
+            document.body.appendChild(col);
+        }
+        const style = document.createElement('style');
+        style.textContent = `@keyframes matrix-fall { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }`;
+        document.head.appendChild(style);
+    }
+    createMatrixColumns();
+
+    // ========================
+    // PROGRESS BAR
+    // ========================
+    window.addEventListener('scroll', () => {
+        const bar = document.getElementById('progress-bar');
+        const doc = document.documentElement;
+        const pct = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100;
+        bar.style.width = pct + '%';
+    });
+
+    // ========================
+    // TYPING EFFECT
+    // ========================
+    const typingTexts = [
+        '> Bienvenidos a la exposicion de GIT...',
+        '> git init: donde todo comienza...',
+        '> git commit -m "primera version"...',
+        '> git push origin main...',
+        '> Control de versiones desde 2005...',
+        '> Creado por Linus Torvalds en 2 semanas...',
+        '> +100 millones de devs usan GitHub...',
+    ];
+
+    let textIndex = 0, charIndex = 0, isDeleting = false;
+    const typingEl = document.getElementById('typing-text');
+
+    function typeEffect() {
+        const current = typingTexts[textIndex];
+        if (!isDeleting) {
+            typingEl.innerHTML = current.substring(0, charIndex) + '<span class="cursor"></span>';
+            charIndex++;
+            if (charIndex > current.length) { isDeleting = true; setTimeout(typeEffect, 2000); return; }
+            setTimeout(typeEffect, 60 + Math.random() * 40);
+        } else {
+            typingEl.innerHTML = current.substring(0, charIndex) + '<span class="cursor"></span>';
+            charIndex--;
+            if (charIndex < 0) { isDeleting = false; textIndex = (textIndex + 1) % typingTexts.length; setTimeout(typeEffect, 500); return; }
+            setTimeout(typeEffect, 30);
+        }
+    }
+    typeEffect();
+
+    // ========================
+    // SCROLL ANIMATIONS
+    // ========================
+    function scrollToSection(id) {
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in, .timeline-item').forEach(el => observer.observe(el));
+
+    // ========================
+    // INTERACTIVE TIMELINE
+    // ========================
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    
+    // Staggered animation on scroll
+    const timelineObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, index * 150);
+            }
+        });
+    }, { threshold: 0.2, rootMargin: '0px 0px -50px 0px' });
+
+    timelineItems.forEach(item => timelineObserver.observe(item));
+
+    // Click to highlight/expand
+    timelineItems.forEach(item => {
+        item.addEventListener('click', () => {
+            timelineItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            // Smooth scroll to center the item
+            item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+
+    // Progress indicator based on scroll
+    const timeline = document.querySelector('.timeline');
+    if (timeline) {
+        const progressBar = document.createElement('div');
+        progressBar.className = 'timeline-progress';
+        timeline.appendChild(progressBar);
+
+        window.addEventListener('scroll', () => {
+            const timelineRect = timeline.getBoundingClientRect();
+            const timelineHeight = timeline.offsetHeight;
+            const windowHeight = window.innerHeight;
+            
+            if (timelineRect.top < windowHeight && timelineRect.bottom > 0) {
+                const scrolled = Math.min(100, Math.max(0, 
+                    ((windowHeight - timelineRect.top) / (timelineHeight + windowHeight)) * 100
+                ));
+                progressBar.style.height = scrolled + '%';
+            }
+        });
+    }
+
+    // Active nav button on scroll
+    const sections = document.querySelectorAll('section');
+    const navBtns = document.querySelectorAll('.nav-btn');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            if (window.scrollY >= section.offsetTop - 200) current = section.getAttribute('id');
+        });
+        navBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(current)) btn.classList.add('active');
+        });
+    });
+
+    // ========================
+    // INTERACTIVE TERMINAL SIMULATOR
+    // ========================
+    const terminalBody = document.getElementById('terminal-body');
+    const terminalInput = document.getElementById('terminal-input');
+    const fileTreeEl = document.getElementById('file-tree');
+    const currentPathEl = document.getElementById('current-path');
+
+    // Virtual File System
+    let currentPath = '/home';
+    let fileSystem = {
+        '/home': {
+            type: 'folder',
+            children: {
+                'documentos': {
+                    type: 'folder',
+                    children: {
+                        'notas.txt': { type: 'file', content: 'Mis notas importantes del curso de CLI', size: '128B' },
+                        'tareas.md': { type: 'file', content: '# Tareas\n- Aprender comandos basicos\n- Practicar con el simulador', size: '85B' }
+                    }
+                },
+                'proyectos': {
+                    type: 'folder',
+                    children: {
+                        'web': {
+                            type: 'folder',
+                            children: {
+                                'index.html': { type: 'file', content: '<!DOCTYPE html><html>...</html>', size: '2KB' },
+                                'styles.css': { type: 'file', content: 'body { margin: 0; }', size: '512B' }
+                            }
+                        },
+                        'script.py': { type: 'file', content: 'print("Hola desde Python!")', size: '32B' }
+                    }
+                },
+                'descargas': {
+                    type: 'folder',
+                    children: {}
+                },
+                'readme.txt': { type: 'file', content: 'Bienvenido! Este es un simulador de sistema de archivos.', size: '64B' },
+                '.bashrc': { type: 'file', content: '# Configuracion de Bash\nexport PATH=$PATH:/usr/local/bin', size: '48B' }
+            }
+        }
+    };
+
+    // Command History
+    let commandHistory = [];
+    let historyIndex = -1;
+
+    // Get folder at path
+    function getFolderAtPath(path) {
+        const parts = path.split('/').filter(p => p);
+        let current = fileSystem['/home'];
+        if (path === '/home') return current;
+        
+        for (let i = 1; i < parts.length; i++) {
+            if (current.children && current.children[parts[i]]) {
+                current = current.children[parts[i]];
+            } else {
+                return null;
+            }
+        }
+        return current;
+    }
+
+    // Render file explorer
+    function renderFileExplorer() {
+        const folder = getFolderAtPath(currentPath);
+        currentPathEl.textContent = currentPath;
+        
+        if (!folder || !folder.children) {
+            fileTreeEl.innerHTML = '<li class="empty-folder">Carpeta vacia</li>';
+            return;
+        }
+
+        const entries = Object.entries(folder.children);
+        if (entries.length === 0) {
+            fileTreeEl.innerHTML = '<li class="empty-folder">Carpeta vacia</li>';
+            return;
+        }
+
+        // Sort: folders first, then files
+        entries.sort((a, b) => {
+            if (a[1].type === 'folder' && b[1].type !== 'folder') return -1;
+            if (a[1].type !== 'folder' && b[1].type === 'folder') return 1;
+            return a[0].localeCompare(b[0]);
+        });
+
+        let html = '';
+        entries.forEach(([name, item]) => {
+            const isFolder = item.type === 'folder';
+            const icon = isFolder ? '📁' : getFileIcon(name);
+            const size = item.size || '';
+            html += `<li class="file-item ${isFolder ? 'folder' : 'file'}" data-name="${name}">
+                <span class="file-icon">${icon}</span>
+                <span class="file-name">${name}</span>
+                <span class="file-size">${size}</span>
+            </li>`;
+        });
+        fileTreeEl.innerHTML = html;
+    }
+
+    function getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        const icons = {
+            'txt': '📄', 'md': '📝', 'html': '🌐', 'css': '🎨', 
+            'js': '⚡', 'py': '🐍', 'json': '📋', 'zip': '📦',
+            'jpg': '🖼️', 'png': '🖼️', 'pdf': '📕', 'sh': '⚙️'
+        };
+        return icons[ext] || '📄';
+    }
+
+    // Add terminal output
+    function addLine(text, type = 'output') {
+        const line = document.createElement('div');
+        line.className = `terminal-line terminal-${type}`;
+        line.innerHTML = text;
+        terminalBody.appendChild(line);
+        terminalBody.scrollTop = terminalBody.scrollHeight;
+    }
+
+    // Highlight new item in explorer
+    function highlightNewItem(name) {
+        setTimeout(() => {
+            const item = fileTreeEl.querySelector(`[data-name="${name}"]`);
+            if (item) item.classList.add('new-item');
+        }, 50);
+    }
+
+    // Animate deletion
+    function animateDelete(name) {
+        const item = fileTreeEl.querySelector(`[data-name="${name}"]`);
+        if (item) {
+            item.classList.add('deleting');
+            setTimeout(() => renderFileExplorer(), 400);
+        } else {
+            renderFileExplorer();
+        }
+    }
+
+    // Process commands
+    function processCommand(input) {
+        const parts = input.trim().split(/\s+/);
+        const cmd = parts[0].toLowerCase();
+        const args = parts.slice(1);
+
+        addLine(`<span style="color:var(--pink)">user@linux:${currentPath}$</span> ${input}`, 'prompt');
+
+        const folder = getFolderAtPath(currentPath);
+
+        switch(cmd) {
+            case 'help':
+                addLine('Comandos disponibles:', 'success');
+                addLine('');
+                addLine('  <span style="color:var(--terminal-green)">-- COMANDOS BASICOS --</span>');
+                addLine('  <span style="color:var(--terminal-green)">ls</span>           Lista archivos y carpetas');
+                addLine('  <span style="color:var(--terminal-green)">pwd</span>          Muestra directorio actual');
+                addLine('  <span style="color:var(--terminal-green)">cd [dir]</span>     Cambia de directorio');
+                addLine('  <span style="color:var(--terminal-green)">mkdir [name]</span> Crea una carpeta');
+                addLine('  <span style="color:var(--terminal-green)">touch [name]</span> Crea un archivo vacio');
+                addLine('  <span style="color:var(--terminal-green)">rm [name]</span>    Elimina archivo o carpeta');
+                addLine('  <span style="color:var(--terminal-green)">cat [file]</span>   Muestra contenido de archivo');
+                addLine('  <span style="color:var(--terminal-green)">clear</span>        Limpia la terminal');
+                addLine('');
+                addLine('  <span style="color:var(--pink)">-- COMANDOS GIT --</span>');
+                addLine('  <span style="color:var(--pink)">git init</span>     Inicia un repositorio');
+                addLine('  <span style="color:var(--pink)">git status</span>   Estado del repositorio');
+                addLine('  <span style="color:var(--pink)">git add .</span>    Agrega archivos al staging');
+                addLine('  <span style="color:var(--pink)">git commit</span>   Guarda cambios');
+                addLine('  <span style="color:var(--pink)">git log</span>      Historial de commits');
+                addLine('  <span style="color:var(--pink)">git branch</span>   Lista ramas');
+                addLine('  <span style="color:var(--pink)">git checkout</span> Cambia de rama');
+                break;
+
+            case 'ls':
+                if (!folder || !folder.children) {
+                    addLine('Error al leer directorio', 'error');
+                    break;
+                }
+                const entries = Object.entries(folder.children);
+                if (entries.length === 0) {
+                    addLine('(carpeta vacia)');
+                } else if (args.includes('-la') || args.includes('-l')) {
+                    addLine('total ' + entries.length);
+                    entries.forEach(([name, item]) => {
+                        const type = item.type === 'folder' ? 'd' : '-';
+                        const size = item.size || '0B';
+                        const color = item.type === 'folder' ? 'var(--pink)' : 'var(--lavender)';
+                        addLine(`${type}rwxr-xr-x  user  ${size.padStart(6)}  <span style="color:${color}">${name}</span>`);
+                    });
+                } else {
+                    const names = entries.map(([name, item]) => {
+                        const color = item.type === 'folder' ? 'var(--pink)' : 'var(--lavender)';
+                        return `<span style="color:${color}">${name}</span>`;
+                    });
+                    addLine(names.join('  '));
+                }
+                break;
+
+            case 'pwd':
+                addLine(currentPath, 'success');
+                break;
+
+            case 'cd':
+                if (!args[0] || args[0] === '~') {
+                    currentPath = '/home';
+                } else if (args[0] === '..') {
+                    const parts = currentPath.split('/').filter(p => p);
+                    if (parts.length > 1) {
+                        parts.pop();
+                        currentPath = '/' + parts.join('/');
+                    }
+                } else if (args[0] === '/') {
+                    currentPath = '/home';
+                } else {
+                    const targetName = args[0].replace(/\/$/, '');
+                    if (folder.children && folder.children[targetName] && folder.children[targetName].type === 'folder') {
+                        currentPath = currentPath + '/' + targetName;
+                        addLine(`Entrando a ${targetName}/`, 'success');
+                    } else {
+                        addLine(`cd: ${args[0]}: No es un directorio`, 'error');
+                        break;
+                    }
+                }
+                renderFileExplorer();
+                break;
+
+            case 'mkdir':
+                if (!args[0]) {
+                    addLine('mkdir: falta operando', 'error');
+                    break;
+                }
+                const newDirName = args[0].replace(/[^a-zA-Z0-9_.-]/g, '');
+                if (folder.children && folder.children[newDirName]) {
+                    addLine(`mkdir: no se puede crear «${newDirName}»: Ya existe`, 'error');
+                } else {
+                    folder.children[newDirName] = { type: 'folder', children: {} };
+                    addLine(`Carpeta '${newDirName}' creada`, 'success');
+                    renderFileExplorer();
+                    highlightNewItem(newDirName);
+                }
+                break;
+
+            case 'touch':
+                if (!args[0]) {
+                    addLine('touch: falta operando', 'error');
+                    break;
+                }
+                const newFileName = args[0].replace(/[^a-zA-Z0-9_.-]/g, '');
+                if (folder.children && folder.children[newFileName]) {
+                    addLine(`Archivo '${newFileName}' actualizado`);
+                } else {
+                    folder.children[newFileName] = { type: 'file', content: '', size: '0B' };
+                    addLine(`Archivo '${newFileName}' creado`, 'success');
+                    renderFileExplorer();
+                    highlightNewItem(newFileName);
+                }
+                break;
+
+            case 'rm':
+                if (!args[0]) {
+                    addLine('rm: falta operando', 'error');
+                    break;
+                }
+                const toDelete = args[0];
+                if (folder.children && folder.children[toDelete]) {
+                    const item = folder.children[toDelete];
+                    if (item.type === 'folder' && Object.keys(item.children).length > 0 && !args.includes('-r')) {
+                        addLine(`rm: no se puede borrar «${toDelete}»: Es un directorio (usa -r)`, 'error');
+                    } else {
+                        delete folder.children[toDelete];
+                        addLine(`'${toDelete}' eliminado`, 'success');
+                        animateDelete(toDelete);
+                    }
+                } else {
+                    addLine(`rm: no se puede borrar «${toDelete}»: No existe`, 'error');
+                }
+                break;
+
+            case 'cat':
+                if (!args[0]) {
+                    addLine('cat: falta operando', 'error');
+                    break;
+                }
+                const fileToRead = args[0];
+                if (folder.children && folder.children[fileToRead]) {
+                    const file = folder.children[fileToRead];
+                    if (file.type === 'file') {
+                        if (file.content) {
+                            file.content.split('\n').forEach(line => addLine(line));
+                        } else {
+                            addLine('(archivo vacio)');
+                        }
+                    } else {
+                        addLine(`cat: ${fileToRead}: Es un directorio`, 'error');
+                    }
+                } else {
+                    addLine(`cat: ${fileToRead}: No existe`, 'error');
+                }
+                break;
+
+            case 'echo':
+                const text = args.join(' ').replace(/^["']|["']$/g, '');
+                addLine(text || '');
+                break;
+
+            case 'cp':
+                if (args.length < 2) {
+                    addLine('cp: faltan operandos', 'error');
+                    break;
+                }
+                const src = args[0], dest = args[1];
+                if (folder.children && folder.children[src]) {
+                    const original = folder.children[src];
+                    if (original.type === 'file') {
+                        folder.children[dest] = { ...original };
+                        addLine(`'${src}' copiado a '${dest}'`, 'success');
+                        renderFileExplorer();
+                        highlightNewItem(dest);
+                    } else {
+                        addLine('cp: no se puede copiar directorios sin -r', 'error');
+                    }
+                } else {
+                    addLine(`cp: ${src}: No existe`, 'error');
+                }
+                break;
+
+            case 'mv':
+                if (args.length < 2) {
+                    addLine('mv: faltan operandos', 'error');
+                    break;
+                }
+                const mvSrc = args[0], mvDest = args[1];
+                if (folder.children && folder.children[mvSrc]) {
+                    folder.children[mvDest] = folder.children[mvSrc];
+                    delete folder.children[mvSrc];
+                    addLine(`'${mvSrc}' movido a '${mvDest}'`, 'success');
+                    renderFileExplorer();
+                    highlightNewItem(mvDest);
+                } else {
+                    addLine(`mv: ${mvSrc}: No existe`, 'error');
+                }
+                break;
+
+            case 'clear':
+                terminalBody.innerHTML = '';
+                break;
+
+            case 'whoami':
+                addLine('user', 'success');
+                break;
+
+            case 'date':
+                addLine(new Date().toLocaleString('es-ES', { 
+                    weekday: 'long', year: 'numeric', month: 'long', 
+                    day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                }), 'success');
+                break;
+
+            case 'tree':
+                addLine(currentPath, 'success');
+                function printTree(node, prefix = '') {
+                    if (!node.children) return;
+                    const entries = Object.entries(node.children);
+                    entries.forEach(([name, item], i) => {
+                        const isLast = i === entries.length - 1;
+                        const connector = isLast ? '└── ' : '├── ';
+                        const color = item.type === 'folder' ? 'var(--pink)' : 'var(--lavender)';
+                        addLine(`${prefix}${connector}<span style="color:${color}">${name}</span>`);
+                        if (item.type === 'folder') {
+                            printTree(item, prefix + (isLast ? '    ' : '│   '));
+                        }
+                    });
+                }
+                printTree(folder);
+                break;
+
+            case 'neofetch':
+                addLine('');
+                addLine('  ██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗', 'success');
+                addLine('  ██║     ██║████╗  ██║██║   ██║╚██╗██╔╝', 'success');
+                addLine('  ██║     ██║██╔██╗ ██║██║   ██║ ╚███╔╝', 'success');
+                addLine('  ██║     ██║██║╚██╗██║██║   ██║ ██╔██╗', 'output');
+                addLine('  ███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗', 'output');
+                addLine('  ╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝', 'output');
+                addLine('');
+                addLine('  <span style="color:var(--pink)">OS:</span> CLI-Simulator Linux');
+                addLine('  <span style="color:var(--pink)">Shell:</span> bash 5.1.0');
+                addLine('  <span style="color:var(--pink)">Terminal:</span> web-simulator');
+                addLine('  <span style="color:var(--pink)">Theme:</span> Neon Pink');
+                break;
+
+            // GIT COMMANDS
+            case 'git':
+                if (!args[0]) {
+                    addLine('git: uso: git <comando> [opciones]', 'error');
+                    addLine('Comandos: init, status, add, commit, log, branch, checkout');
+                    break;
+                }
+                const gitCmd = args[0].toLowerCase();
+                switch(gitCmd) {
+                    case 'init':
+                        if (!window.gitInitialized) {
+                            window.gitInitialized = true;
+                            window.gitCommits = [];
+                            window.gitBranch = 'main';
+                            window.gitStaged = [];
+                            folder.children['.git'] = { type: 'folder', children: {} };
+                            addLine('Initialized empty Git repository in ' + currentPath + '/.git/', 'success');
+                            renderFileExplorer();
+                            highlightNewItem('.git');
+                        } else {
+                            addLine('Reinitialized existing Git repository', 'output');
+                        }
+                        break;
+                    case 'status':
+                        if (!window.gitInitialized) {
+                            addLine('fatal: not a git repository', 'error');
+                        } else {
+                            addLine('On branch <span style="color:var(--terminal-green)">' + window.gitBranch + '</span>', 'success');
+                            if (window.gitStaged.length > 0) {
+                                addLine('Changes to be committed:');
+                                window.gitStaged.forEach(f => addLine('  <span style="color:var(--terminal-green)">new file: ' + f + '</span>'));
+                            } else if (Object.keys(folder.children).filter(n => n !== '.git').length > 0) {
+                                addLine('Untracked files:');
+                                Object.keys(folder.children).filter(n => n !== '.git').forEach(f => {
+                                    addLine('  <span style="color:#ff5f57">' + f + '</span>');
+                                });
+                                addLine('');
+                                addLine('use "git add" to track');
+                            } else {
+                                addLine('nothing to commit, working tree clean');
+                            }
+                        }
+                        break;
+                    case 'add':
+                        if (!window.gitInitialized) {
+                            addLine('fatal: not a git repository', 'error');
+                        } else {
+                            const files = Object.keys(folder.children).filter(n => n !== '.git');
+                            window.gitStaged = files;
+                            addLine('Archivos agregados al staging area', 'success');
+                        }
+                        break;
+                    case 'commit':
+                        if (!window.gitInitialized) {
+                            addLine('fatal: not a git repository', 'error');
+                        } else if (window.gitStaged.length === 0) {
+                            addLine('nothing to commit', 'error');
+                        } else {
+                            const msg = args.slice(1).join(' ').replace(/-m\s*["']?/, '').replace(/["']$/, '') || 'No message';
+                            const hash = Math.random().toString(16).substr(2, 7);
+                            window.gitCommits.push({ hash, msg, date: new Date(), files: window.gitStaged.length });
+                            addLine('[<span style="color:var(--terminal-green)">' + window.gitBranch + '</span> ' + hash + '] ' + msg, 'success');
+                            addLine(' ' + window.gitStaged.length + ' file(s) changed');
+                            window.gitStaged = [];
+                        }
+                        break;
+                    case 'log':
+                        if (!window.gitInitialized) {
+                            addLine('fatal: not a git repository', 'error');
+                        } else if (window.gitCommits.length === 0) {
+                            addLine('No commits yet', 'output');
+                        } else {
+                            window.gitCommits.slice().reverse().forEach(c => {
+                                addLine('<span style="color:var(--pink)">commit ' + c.hash + '</span>');
+                                addLine('Author: user &lt;user@example.com&gt;');
+                                addLine('Date: ' + c.date.toLocaleString());
+                                addLine('');
+                                addLine('    ' + c.msg, 'success');
+                                addLine('');
+                            });
+                        }
+                        break;
+                    case 'branch':
+                        if (!window.gitInitialized) {
+                            addLine('fatal: not a git repository', 'error');
+                        } else if (args[1]) {
+                            if (!window.gitBranches) window.gitBranches = ['main'];
+                            window.gitBranches.push(args[1]);
+                            addLine('Branch "' + args[1] + '" created', 'success');
+                        } else {
+                            if (!window.gitBranches) window.gitBranches = ['main'];
+                            window.gitBranches.forEach(b => {
+                                const marker = b === window.gitBranch ? '* ' : '  ';
+                                const color = b === window.gitBranch ? 'var(--terminal-green)' : 'var(--lavender)';
+                                addLine(marker + '<span style="color:' + color + '">' + b + '</span>');
+                            });
+                        }
+                        break;
+                    case 'checkout':
+                        if (!window.gitInitialized) {
+                            addLine('fatal: not a git repository', 'error');
+                        } else if (!args[1]) {
+                            addLine('git checkout: necesitas especificar una rama', 'error');
+                        } else {
+                            if (!window.gitBranches) window.gitBranches = ['main'];
+                            if (window.gitBranches.includes(args[1])) {
+                                window.gitBranch = args[1];
+                                addLine('Switched to branch "' + args[1] + '"', 'success');
+                            } else if (args[1] === '-b' && args[2]) {
+                                window.gitBranches.push(args[2]);
+                                window.gitBranch = args[2];
+                                addLine('Switched to new branch "' + args[2] + '"', 'success');
+                            } else {
+                                addLine('error: branch "' + args[1] + '" not found', 'error');
+                            }
+                        }
+                        break;
+                    default:
+                        addLine('git: "' + gitCmd + '" no es un comando git', 'error');
+                }
+                break;
+
+            default:
+                addLine(`bash: ${cmd}: comando no encontrado`, 'error');
+                addLine(`Escribe 'help' para ver comandos disponibles`);
+        }
+    }
+
+    // Terminal input handler
+    terminalInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const input = this.value.trim();
+            if (input) {
+                commandHistory.unshift(input);
+                historyIndex = -1;
+                processCommand(input);
+            }
+            this.value = '';
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (historyIndex < commandHistory.length - 1) {
+                historyIndex++;
+                this.value = commandHistory[historyIndex];
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex > 0) {
+                historyIndex--;
+                this.value = commandHistory[historyIndex];
+            } else {
+                historyIndex = -1;
+                this.value = '';
+            }
+        }
+    });
+
+    // Click on file explorer item
+    fileTreeEl.addEventListener('click', function(e) {
+        const item = e.target.closest('.file-item');
+        if (item) {
+            const name = item.dataset.name;
+            const folder = getFolderAtPath(currentPath);
+            if (folder.children[name] && folder.children[name].type === 'folder') {
+                processCommand('cd ' + name);
+            } else if (folder.children[name] && folder.children[name].type === 'file') {
+                processCommand('cat ' + name);
+            }
+        }
+    });
+
+    // Initialize file explorer
+    renderFileExplorer();
+
+    // ========================
+    // FUN FACTS CAROUSEL
+    // ========================
+    const funFacts = [
+        { number: '#1', text: 'Linus Torvalds creo Git en solo 2 SEMANAS en abril de 2005. Estaba tan frustrado con BitKeeper que decidio hacer su propio sistema de control de versiones!', source: 'Historia de Git - 2005' },
+        { number: '#2', text: '"Git" significa "idiota/imbecil" en argot britanico. Linus dijo: "Soy un egoista, asi que nombro todos mis proyectos como yo. Primero Linux, ahora Git."', source: 'Linus Torvalds' },
+        { number: '#3', text: 'El primer commit de Git fue hecho por Linus el 7 de abril de 2005. El mensaje? "Initial revision of git, the information manager from hell". Muy apropiado!', source: 'Git History' },
+        { number: '#4', text: 'GitHub fue comprado por Microsoft en 2018 por $7.5 BILLONES de dolares. Es la adquisicion de software mas grande de Microsoft en su historia!', source: 'Microsoft - 2018' },
+        { number: '#5', text: 'El repositorio del kernel de Linux tiene mas de 1 MILLON de commits y mas de 20,000 contribuidores. Es uno de los proyectos open source mas grandes del mundo.', source: 'Linux Kernel' },
+        { number: '#6', text: 'Git usa SHA-1 para identificar commits. Cada commit tiene un hash unico de 40 caracteres. La probabilidad de colision es 1 en 10^48. Basicamente imposible!', source: 'Criptografia Git' },
+        { number: '#7', text: 'GitHub tiene mas de 100 MILLONES de desarrolladores y mas de 330 millones de repositorios. El 90% de las empresas Fortune 100 usan GitHub!', source: 'GitHub Stats - 2024' },
+        { number: '#8', text: 'El comando "git blame" te muestra quien escribio cada linea de codigo. Perfectamente nombrado para cuando necesitas saber quien rompio algo!', source: 'Git Commands' },
+        { number: '#9', text: 'En 2012, un estudiante subio accidentalmente sus credenciales AWS a GitHub. Bots las encontraron en SEGUNDOS y gastaron $2,000 en mineria de Bitcoin!', source: 'GitHub Security' },
+        { number: '#10', text: 'Git es tan rapido porque casi todas las operaciones son locales. Mientras SVN tardaba minutos en hacer un branch, Git lo hace en milisegundos!', source: 'Git Performance' },
+    ];
+
+    let currentFact = 0;
+    const carouselEl = document.getElementById('facts-carousel');
+
+    function renderFacts() {
+        let html = '';
+        funFacts.forEach((fact, i) => {
+            html += '<div class="fact-card ' + (i === 0 ? 'active' : '') + '" data-index="' + i + '">' +
+                '<div class="fact-number">' + fact.number + '</div>' +
+                '<p class="fact-text">' + fact.text + '</p>' +
+                '<p class="fact-source">' + fact.source + '</p></div>';
+        });
+        html += '<div class="fact-nav">' +
+            '<button class="fact-btn" onclick="changeFact(-1)">&lt;</button>' +
+            '<button class="fact-btn" onclick="changeFact(1)">&gt;</button></div>' +
+            '<div class="fact-dots">' +
+            funFacts.map(function(_, i){ return '<div class="fact-dot ' + (i === 0 ? 'active' : '') + '" onclick="goToFact(' + i + ')"></div>'; }).join('') +
+            '</div>';
+        carouselEl.innerHTML = html;
+    }
+
+    function changeFact(dir) {
+        currentFact = (currentFact + dir + funFacts.length) % funFacts.length;
+        updateFact();
+    }
+
+    function goToFact(index) {
+        currentFact = index;
+        updateFact();
+    }
+
+    function updateFact() {
+        document.querySelectorAll('.fact-card').forEach(function(card, i) {
+            card.classList.toggle('active', i === currentFact);
+        });
+        document.querySelectorAll('.fact-dot').forEach(function(dot, i) {
+            dot.classList.toggle('active', i === currentFact);
+        });
+    }
+    renderFacts();
+    setInterval(function(){ changeFact(1); }, 8000);
+
+    // ========================
+    // QUIZ GAME - CLI & GIT
+    // ========================
+    const cliQuestions = [
+        { question: 'Que hace este comando?', command: 'ls', options: ['Lista archivos y carpetas', 'Apaga la computadora', 'Borra todo', 'Instala programas'], correct: 0 },
+        { question: 'Que hace este comando?', command: 'cd Documents', options: ['Crea una carpeta', 'Entra a la carpeta Documents', 'Borra Documents', 'Copia Documents'], correct: 1 },
+        { question: 'Que hace este comando?', command: 'mkdir nueva_carpeta', options: ['Borra una carpeta', 'Mueve una carpeta', 'Crea una nueva carpeta', 'Renombra una carpeta'], correct: 2 },
+        { question: 'Que hace este comando?', command: 'rm archivo.txt', options: ['Lee el archivo', 'Renombra el archivo', 'Copia el archivo', 'Elimina el archivo'], correct: 3 },
+        { question: 'Que hace este comando?', command: 'pwd', options: ['Muestra la carpeta actual', 'Cambia la contrasena', 'Apaga la PC', 'Muestra procesos'], correct: 0 },
+        { question: 'Que hace este comando?', command: 'cp foto.jpg backup/', options: ['Borra la foto', 'Abre la foto', 'Copia la foto a backup/', 'Mueve la foto'], correct: 2 },
+        { question: 'Que hace este comando?', command: 'echo "Hola Mundo"', options: ['Crea un archivo', 'Busca texto', 'Imprime "Hola Mundo" en pantalla', 'Envia un email'], correct: 2 },
+        { question: 'Que hace este comando?', command: 'cat readme.txt', options: ['Muestra un gato', 'Muestra el contenido del archivo', 'Borra el archivo', 'Comprime el archivo'], correct: 1 },
+        { question: 'Que significa "CLI"?', command: 'CLI = ???', options: ['Computer Language Input', 'Command Line Interface', 'Code Level Integration', 'Central Logic Interface'], correct: 1 },
+    ];
+
+    const gitQuestions = [
+        { question: 'Que hace este comando?', command: 'git init', options: ['Borra un repositorio', 'Inicia un nuevo repositorio', 'Clona un repo', 'Hace un commit'], correct: 1 },
+        { question: 'Que hace este comando?', command: 'git clone url', options: ['Crea un archivo', 'Descarga/copia un repositorio remoto', 'Sube cambios', 'Borra un repo'], correct: 1 },
+        { question: 'Que hace este comando?', command: 'git add .', options: ['Agrega todos los archivos al staging', 'Borra archivos', 'Hace commit', 'Crea un branch'], correct: 0 },
+        { question: 'Que hace este comando?', command: 'git commit -m "mensaje"', options: ['Sube al servidor', 'Borra cambios', 'Guarda cambios con un mensaje', 'Crea una rama'], correct: 2 },
+        { question: 'Que hace este comando?', command: 'git push', options: ['Descarga cambios', 'Sube commits al repositorio remoto', 'Crea un branch', 'Hace merge'], correct: 1 },
+        { question: 'Que hace este comando?', command: 'git pull', options: ['Sube cambios', 'Descarga y fusiona cambios del remoto', 'Borra un branch', 'Revierte commits'], correct: 1 },
+        { question: 'Que hace este comando?', command: 'git branch nueva-rama', options: ['Borra una rama', 'Crea una nueva rama', 'Cambia de rama', 'Fusiona ramas'], correct: 1 },
+        { question: 'Que hace este comando?', command: 'git checkout main', options: ['Crea rama main', 'Cambia a la rama main', 'Borra main', 'Fusiona con main'], correct: 1 },
+        { question: 'Que hace este comando?', command: 'git merge feature', options: ['Borra la rama feature', 'Fusiona feature con la rama actual', 'Crea rama feature', 'Revierte feature'], correct: 1 },
+        { question: 'Que hace este comando?', command: 'git status', options: ['Muestra el estado de los archivos', 'Sube cambios', 'Borra el historial', 'Crea un commit'], correct: 0 },
+        { question: 'Que hace este comando?', command: 'git log', options: ['Crea un log', 'Muestra el historial de commits', 'Borra commits', 'Sube a GitHub'], correct: 1 },
+        { question: 'Que significa "GIT"?', command: 'GIT = ???', options: ['Global Internet Transfer', 'Stupid content tracker (segun Linus)', 'Get It Together', 'Graphical Interface Tool'], correct: 1 },
+    ];
+
+    let currentQuestion = 0, score = 0, answered = false, shuffledQuestions = [];
+    let currentGameType = 'cli';
+
+    function shuffleArray(arr) {
+        const s = arr.slice();
+        for (let i = s.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [s[i], s[j]] = [s[j], s[i]]; }
+        return s;
+    }
+
+    function switchGame(type) {
+        currentGameType = type;
+        document.getElementById('btn-game-cli').style.opacity = type === 'cli' ? '1' : '0.6';
+        document.getElementById('btn-game-git').style.opacity = type === 'git' ? '1' : '0.6';
+        initGame();
+    }
+
+    function initGame() {
+        const questions = currentGameType === 'cli' ? cliQuestions : gitQuestions;
+        shuffledQuestions = shuffleArray(questions).slice(0, 6);
+        currentQuestion = 0;
+        score = 0;
+        answered = false;
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const container = document.getElementById('game-container');
+        const gameLabel = currentGameType === 'cli' ? 'CLI' : 'GIT';
+        if (currentQuestion >= shuffledQuestions.length) {
+            const msg = score >= 5 ? 'Eres un MASTER de ' + gameLabel + '!' : score >= 3 ? 'Buen trabajo! Sigue practicando!' : 'No te rindas! Intenta de nuevo!';
+            container.innerHTML =
+                '<div class="game-question"><div class="fact-number">&#9733;</div>' +
+                '<div class="game-question-text">Resultado Final - ' + gameLabel + '</div>' +
+                '<div class="game-command">' + score + ' / ' + shuffledQuestions.length + '</div>' +
+                '<p style="color:var(--lavender);font-size:14px;">' + msg + '</p></div>' +
+                '<button class="glow-btn" onclick="initGame()">Jugar de nuevo</button>';
+            return;
+        }
+        const q = shuffledQuestions[currentQuestion];
+        let optionsHtml = '';
+        q.options.forEach(function(opt, i) {
+            optionsHtml += '<button class="game-option" onclick="checkAnswer(' + i + ')" data-index="' + i + '">' +
+                String.fromCharCode(65 + i) + ') ' + opt + '</button>';
+        });
+        container.innerHTML =
+            '<div class="game-score">Juego: ' + gameLabel + ' | Puntos: ' + score + '/' + shuffledQuestions.length + ' | Pregunta ' + (currentQuestion + 1) + '/' + shuffledQuestions.length + '</div>' +
+            '<div class="game-question"><div class="game-question-text">' + q.question + '</div>' +
+            '<div class="game-command">' + q.command + '</div></div>' +
+            '<div class="game-options">' + optionsHtml + '</div>' +
+            '<div class="game-result" id="game-result"></div>';
+        answered = false;
+    }
+
+    function checkAnswer(selected) {
+        if (answered) return;
+        answered = true;
+        const q = shuffledQuestions[currentQuestion];
+        const options = document.querySelectorAll('.game-option');
+        const resultEl = document.getElementById('game-result');
+
+        options.forEach(function(opt, i) {
+            opt.style.pointerEvents = 'none';
+            if (i === q.correct) opt.classList.add('correct');
+            else if (i === selected && selected !== q.correct) opt.classList.add('wrong');
+        });
+
+        if (selected === q.correct) {
+            score++;
+            resultEl.innerHTML = '<span style="color:var(--terminal-green);">Correcto! +1 punto</span>';
+        } else {
+            resultEl.innerHTML = '<span style="color:#ff5f57;">Incorrecto! La respuesta era: ' + q.options[q.correct] + '</span>';
+        }
+        setTimeout(function() { currentQuestion++; renderQuestion(); }, 2000);
+    }
+
+    initGame();
+
+    // ========================
+    // MOUSE TRAIL EFFECT
+    // ========================
+    document.addEventListener('mousemove', function(e) {
+        if (Math.random() > 0.87) {
+            const trail = document.createElement('div');
+            const c = Math.random() > 0.5 ? '#ff6ec7' : '#a855f7';
+            trail.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;width:' + (4 + Math.random()*4) + 'px;height:' + (4 + Math.random()*4) + 'px;background:' + c + ';pointer-events:none;z-index:9999;image-rendering:pixelated;box-shadow:0 0 6px ' + c + ';transition:all 0.8s ease;';
+            document.body.appendChild(trail);
+            setTimeout(function() { trail.style.opacity = '0'; trail.style.transform = 'translateY(' + (-20 - Math.random()*30) + 'px) scale(0)'; }, 10);
+            setTimeout(function() { trail.remove(); }, 900);
+        }
+    });
+
+    // ========================
+    // CLICK SPARKLE EFFECT
+    // ========================
+    document.addEventListener('click', function(e) {
+        for (let i = 0; i < 8; i++) {
+            const spark = document.createElement('div');
+            const angle = (i / 8) * Math.PI * 2;
+            const distance = 30 + Math.random() * 20;
+            const colors = ['#ff6ec7', '#a855f7', '#ff00ff', '#e0b0ff', '#ff1493'];
+            const c = colors[Math.floor(Math.random() * colors.length)];
+            spark.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;width:4px;height:4px;background:' + c + ';pointer-events:none;z-index:9999;transition:all 0.6s ease-out;box-shadow:0 0 8px ' + c + ';';
+            document.body.appendChild(spark);
+            setTimeout(function() {
+                spark.style.transform = 'translate(' + (Math.cos(angle)*distance) + 'px,' + (Math.sin(angle)*distance) + 'px)';
+                spark.style.opacity = '0';
+            }, 10);
+            setTimeout(function() { spark.remove(); }, 700);
+        }
+    });
+
+    // ========================
+    // KONAMI CODE EASTER EGG
+    // ========================
+    const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let konamiIndex = 0;
+    document.addEventListener('keydown', function(e) {
+        if (e.key === konamiCode[konamiIndex]) {
+            konamiIndex++;
+            if (konamiIndex === konamiCode.length) {
+                konamiIndex = 0;
+                document.body.style.animation = 'rainbow-bg 2s';
+                const s = document.createElement('style');
+                s.textContent = '@keyframes rainbow-bg { 0% { filter: hue-rotate(0deg); } 50% { filter: hue-rotate(180deg); } 100% { filter: hue-rotate(360deg); } }';
+                document.head.appendChild(s);
+                setTimeout(function(){ document.body.style.animation = ''; }, 2000);
+                addTerminalLine('KONAMI CODE ACTIVADO! Easter egg desbloqueado!', 'success');
+            }
+        } else {
+            konamiIndex = 0;
+        }
+    });
+    </script>
+</body>
+</html>
